@@ -1,0 +1,46 @@
+<svg width="1200" height="600" viewBox="0 0 1200 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&amp;family=Roboto+Condensed:wght@700&amp;display=swap');
+      .navy { fill: #1A243B; }
+      .red { fill: #B22222; }
+      .white { fill: #FFFFFF; }
+      .font-oswald { font-family: 'Oswald', sans-serif; font-weight: 700; }
+      .font-roboto-condensed { font-family: 'Roboto Condensed', sans-serif; font-weight: 700; }
+    </style>
+  </defs>
+
+  <g id="logo-graphic">
+    <!-- Top banner -->
+    <g id="top-banner">
+      <!-- Base shape -->
+      <path d="M 240,180 H 640 V 160 H 960 V 230 H 240 Z" class="white" />
+      
+      <!-- Blue part -->
+      <path d="M 240,180 H 640 V 230 H 240 Z" class="navy" />
+      
+      <!-- Stripes -->
+      <g id="stripes">
+        <rect x="640" y="190" width="320" height="15" class="red"/>
+        <rect x="640" y="215" width="320" height="15" class="red"/>
+      </g>
+
+      <!-- Text and Star -->
+      <text x="310" y="218" class="font-roboto-condensed white" font-size="36">ELECT BRIAN</text>
+      <text x="560" y="222" class="white" font-size="50">★</text>
+      <text x="800" y="150" class="font-roboto-condensed navy" font-size="28" text-anchor="middle">PUTNAM COUNTY</text>
+    </g>
+
+    <!-- Main Name -->
+    <text x="600" y="320" class="font-oswald navy" font-size="220" text-anchor="middle">HESS</text>
+    
+    <!-- Sheriff Banner -->
+    <g id="sheriff-banner">
+      <rect x="240" y="350" width="720" height="80" class="red"/>
+      <text x="600" y="410" class="font-oswald white" font-size="70" text-anchor="middle" letter-spacing="5">SHERIFF</text>
+      <text x="300" y="415" class="white" font-size="50" text-anchor="middle">★</text>
+      <text x="900" y="415" class="white" font-size="50" text-anchor="middle">★</text>
+    </g>
+  </g>
+
+</svg> 

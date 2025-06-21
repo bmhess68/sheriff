@@ -1,0 +1,22 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="95" fill="#1A243B" stroke="#B22222" stroke-width="3"/>
+  
+  <!-- Sheriff star -->
+  <g transform="translate(100, 100)">
+    <!-- Main star points -->
+    <path d="M0,-60 L15,-20 L55,-20 L25,10 L35,50 L0,30 L-35,50 L-25,10 L-55,-20 L-15,-20 Z" 
+          fill="#B22222" stroke="#FFFFFF" stroke-width="2"/>
+    
+    <!-- Inner star -->
+    <path d="M0,-35 L10,-12 L32,-12 L20,6 L28,30 L0,18 L-28,30 L-20,6 L-32,-12 L-10,-12 Z" 
+          fill="#FFFFFF"/>
+    
+    <!-- Center circle -->
+    <circle cx="0" cy="0" r="8" fill="#B22222"/>
+  </g>
+  
+  <!-- Text elements -->
+  <text x="100" y="160" text-anchor="middle" fill="#1A243B" font-family="Arial, sans-serif" font-size="14" font-weight="bold">PUTNAM COUNTY</text>
+  <text x="100" y="175" text-anchor="middle" fill="#B22222" font-family="Arial, sans-serif" font-size="12" font-weight="bold">SHERIFF</text>
+</svg> 
