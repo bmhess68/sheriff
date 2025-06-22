@@ -259,6 +259,23 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 2rem;
 }
 
+.hero-title-new {
+    font-size: 3.5rem;
+    color: var(--white);
+    margin: 0 0 1rem 0;
+    line-height: 1.1;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+    font-weight: 700;
+}
+
+.hero-subtitle-new {
+    font-size: 1.8rem;
+    color: var(--sheriff-red);
+    margin: 0 0 1rem 0;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    font-weight: 600;
+}
+
 .hero-title {
     font-size: 3rem;
     margin: 0;
@@ -315,6 +332,13 @@ section {
 
 .candidate-img {
     width: 100%;
+    margin-bottom: 1rem;
+}
+
+.family-img {
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
 }
 
 .badge-overlay {
@@ -362,14 +386,14 @@ section {
     margin-bottom: 1rem;
 }
 
-/* Issues Section */
-.issues-grid {
+/* Mission Section */
+.mission-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
     gap: 2rem;
 }
 
-.issue-card {
+.mission-card {
     background: var(--white);
     padding: 2rem;
     border-radius: 10px;
@@ -378,29 +402,29 @@ section {
     text-align: center;
 }
 
-.issue-card:hover {
+.mission-card:hover {
     transform: translateY(-5px);
     box-shadow: var(--shadow-lg);
 }
 
-.issue-icon {
+.mission-icon {
     font-size: 3rem;
     color: var(--sheriff-red);
     margin-bottom: 1rem;
 }
 
-.issue-card h3 {
+.mission-card h3 {
     color: var(--navy-charcoal);
     margin-bottom: 1rem;
 }
 
-.issue-card p {
+.mission-card p {
     color: var(--medium-gray);
     line-height: 1.6;
 }
 
-/* Endorsements Section */
-.endorsements {
+/* Recommendations Section */
+.recommendations {
     background-color: var(--light-gray);
 }
 
