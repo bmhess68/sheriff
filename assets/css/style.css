@@ -260,7 +260,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .hero-title-new {
-    font-size: 28rem;
+    font-size: 5rem;
     color: var(--white);
     margin: 0 0 1rem 0;
     line-height: 1.1;
