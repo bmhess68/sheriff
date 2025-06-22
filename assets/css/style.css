@@ -1283,8 +1283,8 @@ section {
 
 @media (max-width: 768px) {
     .hero {
-        padding: 100px 0 40px 0;
-        min-height: 60vh;
+        padding: 100px 0 20px 0;
+        min-height: 50vh;
     }
     
     .hero-title-new {
@@ -1300,17 +1300,39 @@ section {
     }
     
     .hero-headshot {
-        max-height: 350px !important;
+        max-height: 280px !important;
+    }
+    
+    .hero-headshot-container {
+        bottom: 10px !important;
     }
 }
 
 @media (max-width: 480px) {
+    .hero {
+        padding: 90px 0 15px 0 !important;
+        min-height: 45vh !important;
+    }
+    
     .hero-title-new {
-        font-size: 2.5rem !important;
+        font-size: 2.2rem !important;
     }
     
     .hero-subtitle-new {
-        font-size: 1.2rem !important;
+        font-size: 1.1rem !important;
+    }
+    
+    .hero-tagline {
+        font-size: 1rem !important;
+        margin-bottom: 1.5rem !important;
+    }
+    
+    .hero-headshot {
+        max-height: 220px !important;
+    }
+    
+    .hero-name-graphic {
+        padding: 1rem !important;
     }
     
     .hero-buttons-container {
@@ -1322,17 +1344,25 @@ section {
         width: 100%;
         max-width: 280px;
         margin: 0.375rem 0 !important;
+        padding: 10px 20px !important;
+        font-size: 14px !important;
     }
 }
 
 /* Mobile-Optimized Section Spacing */
 section {
-    padding: 4rem 0;
+    padding: 3rem 0;
 }
 
 @media (min-width: 768px) {
     section {
         padding: 5rem 0;
+    }
+}
+
+@media (max-width: 480px) {
+    section {
+        padding: 2rem 0;
     }
 }
 
@@ -1405,6 +1435,29 @@ section {
     outline: none;
     border-color: var(--sheriff-red);
     box-shadow: 0 0 0 0.2rem rgba(178, 34, 34, 0.25);
+}
+
+/* Mobile-Optimized About Section Images */
+@media (max-width: 768px) {
+    .about-image .candidate-img,
+    .about-image .family-img {
+        max-height: 300px !important;
+        width: auto !important;
+        object-fit: cover;
+    }
+    
+    .about-image {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .about-image .candidate-img,
+    .about-image .family-img {
+        max-height: 250px !important;
+        max-width: 100% !important;
+    }
 }
 
 /* Mobile-Friendly Contact Section */
