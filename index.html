@@ -23,6 +23,9 @@
 
     <title>Putnam County Sheriff Campaign - Community Safety & Trust</title>
     
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,38 +38,42 @@
     <link rel="stylesheet" href="assets/css/style.css">
     
     <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16x16.png">
+    <link rel="manifest" href="assets/images/site.webmanifest">
     <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar" id="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <img src="assets/images/logo.svg" alt="Hess for Sheriff Logo" class="logo-img">
+    <nav class="navbar navbar-expand-lg fixed-top" id="navbar">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#home">
+                <img src="assets/images/star.jpg" alt="Hess for Sheriff Logo" class="logo-img me-2">
                 <span class="logo-text">Hess for Sheriff</span>
-            </div>
+            </a>
             
-            <div class="nav-menu" id="nav-menu">
-                <a href="#home" class="nav-link">Home</a>
-                <a href="#about" class="nav-link">Vision</a>
-                <a href="#mission" class="nav-link">Mission</a>
-                <a href="#recommendations" class="nav-link">Recommendations</a>
-                <a href="#news" class="nav-link">News & Media</a>
-                <a href="#gallery" class="nav-link">Gallery</a>
-                <a href="#signup" class="nav-link">Sign Up</a>
-                <a href="#contact" class="nav-link">Contact</a>
-            </div>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
             
-            <div class="nav-social">
-                <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
-                <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-                <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
-            </div>
-            
-            <div class="hamburger" id="hamburger">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about">Vision</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#mission">Mission</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#recommendations">Recommendations</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#news">News & Media</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#gallery">Gallery</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#signup">Sign Up</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                </ul>
+                
+                <div class="d-flex">
+                    <a href="#" class="social-link me-3"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="social-link me-3"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+                </div>
             </div>
         </div>
     </nav>
@@ -78,15 +85,19 @@
         <div class="hero-headshot-container">
             <img src="assets/images/hessy.png" alt="Brian M. Hess, Candidate for Putnam County Sheriff" class="hero-headshot">
         </div>
-        <div class="container">
-            <div class="hero-content">
-                <div class="hero-name-graphic">
-                    <h1 class="hero-title-new">Choose Brian</h1>
-                    <h2 class="hero-subtitle-new">For Putnam County Sheriff</h2>
-                    <p class="hero-tagline">Professional. Effective. Proven.</p>
-                    <div class="hero-buttons-container">
-                        <a href="#signup" class="btn btn-primary">Sign Up</a>
-                        <a href="#contact" class="btn btn-secondary">Contact</a>
+        <div class="container h-100">
+            <div class="row h-100 align-items-center">
+                <div class="col-12">
+                    <div class="hero-content text-center">
+                        <div class="hero-name-graphic">
+                            <h1 class="hero-title-new">Choose Brian</h1>
+                            <h2 class="hero-subtitle-new">For Putnam County Sheriff</h2>
+                            <p class="hero-tagline">Professional. Effective. Proven.</p>
+                            <div class="hero-buttons-container d-flex justify-content-center gap-3">
+                                <a href="#signup" class="btn btn-primary">Sign Up</a>
+                                <a href="#contact" class="btn btn-secondary">Contact</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -94,33 +105,37 @@
     </section>
 
     <!-- About Section -->
-    <section id="about" class="about">
+    <section id="about" class="about py-5">
         <div class="container">
-            <div class="about-content">
-                <div class="about-image">
-                    <img src="assets/images/headshot.png" alt="Brian Hess - Putnam County Sheriff Candidate" class="candidate-img">
-                    <img src="assets/images/family.jpeg" alt="Brian Hess Family" class="family-img">
-                </div>
-                <div class="about-text">
-                    <h2 class="section-title">A Vision for Smarter Policing</h2>
-                    <p class="about-bio">
-                        With a distinguished 25-year career in law enforcement, Brian Hess is a proven leader and innovator, ready to serve as Putnam County's next Sheriff. A lifelong conservative and devoted community member, Brian has risen through the ranks of the Westchester County Police Department to his current role as Lieutenant, where he founded and commands the Westchester-Putnam Real Time Crime Center. His work has revolutionized regional intelligence sharing, connecting over 65 law enforcement agencies and 5,500 professionals.
-                    </p>
-                    <div class="career-highlights">
-                        <h3>Career Highlights</h3>
-                        <ul class="highlights-list">
-                            <li><i class="fas fa-star"></i> 25+ years of progressive law enforcement experience</li>
-                            <li><i class="fas fa-sitemap"></i> Founder & Commanding Officer of the Westchester-Putnam Real Time Crime Center</li>
-                            <li><i class="fas fa-users"></i> Leads a multi-agency task force of over 180 investigators</li>
-                            <li><i class="fas fa-cogs"></i> Developed cost-effective, nationally recognized public safety technologies</li>
-                            <li><i class="fas fa-user-shield"></i> Co-founder of the region's first pursuit mitigation program</li>
-                        </ul>
+            <div class="row align-items-center g-5">
+                <div class="col-lg-4">
+                    <div class="about-image">
+                        <img src="assets/images/headshot.png" alt="Brian Hess - Putnam County Sheriff Candidate" class="candidate-img img-fluid mb-3 rounded">
+                        <img src="assets/images/family.jpeg" alt="Brian Hess Family" class="family-img img-fluid rounded">
                     </div>
-                    <div class="vision">
-                        <h3>A Vision for a Safer Putnam County</h3>
-                        <p>
-                            "My heart is here in Putnam County. My wife and I have lived in Patterson for over 10 years, raising our six children in this great community. I believe Putnam County deserves a Sheriff who combines boots-on-the-ground experience with a forward-thinking approach to modern policing. I am committed to strengthening our local law enforcement agencies, enhancing school safety, and ensuring every resident feels secure and protected."
+                </div>
+                <div class="col-lg-8">
+                    <div class="about-text">
+                        <h2 class="section-title">A Vision for Smarter Policing</h2>
+                        <p class="about-bio lead">
+                            With a distinguished 25-year career in law enforcement, Brian Hess is a proven leader and innovator, ready to serve as Putnam County's next Sheriff. A lifelong conservative and devoted community member, Brian has risen through the ranks of the Westchester County Police Department to his current role as Lieutenant, where he founded and commands the Westchester-Putnam Real Time Crime Center. His work has revolutionized regional intelligence sharing, connecting over 65 law enforcement agencies and 5,500 professionals.
                         </p>
+                        <div class="career-highlights mb-4">
+                            <h3>Career Highlights</h3>
+                            <ul class="highlights-list list-unstyled">
+                                <li class="d-flex align-items-center mb-2"><i class="fas fa-star text-danger me-3"></i> 25+ years of progressive law enforcement experience</li>
+                                <li class="d-flex align-items-center mb-2"><i class="fas fa-sitemap text-danger me-3"></i> Founder & Commanding Officer of the Westchester-Putnam Real Time Crime Center</li>
+                                <li class="d-flex align-items-center mb-2"><i class="fas fa-users text-danger me-3"></i> Leads a multi-agency task force of over 180 investigators</li>
+                                <li class="d-flex align-items-center mb-2"><i class="fas fa-cogs text-danger me-3"></i> Developed cost-effective, nationally recognized public safety technologies</li>
+                                <li class="d-flex align-items-center mb-2"><i class="fas fa-user-shield text-danger me-3"></i> Co-founder of the region's first pursuit mitigation program</li>
+                            </ul>
+                        </div>
+                        <div class="vision">
+                            <h3 class="text-danger">A Vision for a Safer Putnam County</h3>
+                            <p class="fst-italic">
+                                "My heart is here in Putnam County. My wife and I have lived in Patterson for over 10 years, raising our six children in this great community. I believe Putnam County deserves a Sheriff who combines boots-on-the-ground experience with a forward-thinking approach to modern policing. I am committed to strengthening our local law enforcement agencies, enhancing school safety, and ensuring every resident feels secure and protected."
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -128,56 +143,68 @@
     </section>
 
     <!-- Mission Section -->
-    <section id="mission" class="mission">
+    <section id="mission" class="mission py-5">
         <div class="container">
-            <h2 class="section-title">Mission</h2>
-            <div class="mission-grid">
-                <div class="mission-card">
-                    <div class="mission-icon">
-                        <i class="fas fa-shield-alt"></i>
+            <h2 class="section-title text-center mb-5">Mission</h2>
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="mission-card h-100">
+                        <div class="mission-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3>Community Safety</h3>
+                        <p>Implementing proactive policing strategies to ensure the safety of all Putnam County residents while building trust between law enforcement and the community.</p>
                     </div>
-                    <h3>Community Safety</h3>
-                    <p>Implementing proactive policing strategies to ensure the safety of all Putnam County residents while building trust between law enforcement and the community.</p>
                 </div>
                 
-                <div class="mission-card">
-                    <div class="mission-icon">
-                        <i class="fas fa-chart-line"></i>
+                <div class="col-lg-4 col-md-6">
+                    <div class="mission-card h-100">
+                        <div class="mission-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>Crime Reduction Strategies</h3>
+                        <p>Implementing data-driven approaches to reduce crime rates and improve overall public safety in Putnam County.</p>
                     </div>
-                    <h3>Crime Reduction Strategies</h3>
-                    <p>Implementing data-driven approaches to reduce crime rates and improve overall public safety in Putnam County.</p>
                 </div>
                 
-                <div class="mission-card">
-                    <div class="mission-icon">
-                        <i class="fas fa-laptop"></i>
+                <div class="col-lg-4 col-md-6">
+                    <div class="mission-card h-100">
+                        <div class="mission-icon">
+                            <i class="fas fa-laptop"></i>
+                        </div>
+                        <h3>Technology</h3>
+                        <p>Leveraging modern technology to improve response times, enhance investigations, and provide better service to the community.</p>
                     </div>
-                    <h3>Technology</h3>
-                    <p>Leveraging modern technology to improve response times, enhance investigations, and provide better service to the community.</p>
                 </div>
                 
-                <div class="mission-card">
-                    <div class="mission-icon">
-                        <i class="fas fa-graduation-cap"></i>
+                <div class="col-lg-4 col-md-6">
+                    <div class="mission-card h-100">
+                        <div class="mission-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h3>School & Youth</h3>
+                        <p>Strengthening partnerships with schools to provide education, mentorship, and positive role models for our youth.</p>
                     </div>
-                    <h3>School & Youth</h3>
-                    <p>Strengthening partnerships with schools to provide education, mentorship, and positive role models for our youth.</p>
                 </div>
                 
-                <div class="mission-card">
-                    <div class="mission-icon">
-                        <i class="fas fa-handshake"></i>
+                <div class="col-lg-4 col-md-6">
+                    <div class="mission-card h-100">
+                        <div class="mission-icon">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <h3>Community Trust</h3>
+                        <p>Building stronger relationships between law enforcement and all segments of our diverse community through transparency and open communication.</p>
                     </div>
-                    <h3>Community Trust</h3>
-                    <p>Building stronger relationships between law enforcement and all segments of our diverse community through transparency and open communication.</p>
                 </div>
                 
-                <div class="mission-card">
-                    <div class="mission-icon">
-                        <i class="fas fa-users"></i>
+                <div class="col-lg-4 col-md-6">
+                    <div class="mission-card h-100">
+                        <div class="mission-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3>Multi-Agency Coordination</h3>
+                        <p>Enhancing collaboration between local, state, and federal law enforcement agencies to maximize effectiveness and resource sharing.</p>
                     </div>
-                    <h3>Multi-Agency Coordination</h3>
-                    <p>Enhancing collaboration between local, state, and federal law enforcement agencies to maximize effectiveness and resource sharing.</p>
                 </div>
             </div>
         </div>
@@ -570,6 +597,9 @@
         </div>
     </footer>
 
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    
     <!-- Scripts -->
     <script src="assets/js/main.js"></script>
 </body>
