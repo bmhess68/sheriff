@@ -1,18 +1,20 @@
 # DigitalOcean App Platform Configuration
+# Copy this to app.yaml and add your environment variables in the App Platform dashboard
+
 name: hess-sheriff-campaign
 services:
 - name: sheriff-campaign
   source_dir: /
   github:
     repo: bmhess68/sheriff
-    branch: main
+    branch: election
   run_command: npm start
   environment_slug: node-js
   instance_count: 1
   instance_size_slug: basic-xxs
   envs:
   - key: SENDGRID_API_KEY
-    value: 
+    value: ${SENDGRID_API_KEY}  # Set this in App Platform dashboard
     type: SECRET
   - key: CAMPAIGN_EMAIL
     value: info@hessforsheriff.com
@@ -23,11 +25,3 @@ services:
   - key: PORT
     value: "8080"
   http_port: 8080
-static_sites:
-- name: campaign-assets
-  source_dir: /assets
-  github:
-    repo: bmhess68/sheriff
-    branch: main
-  build_command: echo "No build needed"
-  output_dir: /
