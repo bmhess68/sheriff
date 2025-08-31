@@ -1,0 +1,10 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+README.md
+IMPROVEMENTS.md
+SETUP_GUIDE.md
+.env
+campaign_data.json
+*.log

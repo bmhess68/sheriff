@@ -1,0 +1,33 @@
+# DigitalOcean App Platform Configuration
+name: hess-sheriff-campaign
+services:
+- name: sheriff-campaign
+  source_dir: /
+  github:
+    repo: bmhess68/sheriff
+    branch: main
+  run_command: npm start
+  environment_slug: node-js
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  envs:
+  - key: SENDGRID_API_KEY
+    value: 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
+    type: SECRET
+  - key: CAMPAIGN_EMAIL
+    value: info@hessforsheriff.com
+  - key: FROM_EMAIL
+    value: noreply@hessforsheriff.com
+  - key: NODE_ENV
+    value: production
+  - key: PORT
+    value: "8080"
+  http_port: 8080
+static_sites:
+- name: campaign-assets
+  source_dir: /assets
+  github:
+    repo: bmhess68/sheriff
+    branch: main
+  build_command: echo "No build needed"
+  output_dir: /

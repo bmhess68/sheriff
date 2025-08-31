@@ -5,6 +5,81 @@
     box-sizing: border-box;
 }
 
+/* Skip Link for Accessibility */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: var(--sheriff-red);
+    color: var(--white);
+    padding: 8px;
+    text-decoration: none;
+    border-radius: 4px;
+    z-index: 1000;
+    font-weight: 600;
+}
+
+.skip-link:focus {
+    top: 6px;
+}
+
+/* Lazy loading styles */
+img.lazy {
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+img.lazy.loaded {
+    opacity: 1;
+}
+
+/* Form validation styles */
+.error-message {
+    color: var(--sheriff-red);
+    font-size: 0.875rem;
+    margin-top: 4px;
+    display: block;
+}
+
+.success-message {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+input[aria-invalid="true"],
+textarea[aria-invalid="true"] {
+    border-color: var(--sheriff-red);
+    box-shadow: 0 0 0 2px rgba(178, 34, 34, 0.2);
+}
+
+/* Security and performance improvements */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Better focus indicators for accessibility */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--sheriff-red);
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    :root {
+        --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+}
+
 :root {
     --sheriff-red: #B22222;
     --navy-charcoal: #1A243B;

@@ -1,14 +1,21 @@
 // Main JavaScript for Putnam County Sheriff Campaign Website
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize analytics tracking
+    initializeAnalytics();
+    
+    // Track page view
+    trackPageView();
     // Mobile Navigation Toggle
     const hamburger = document.getElementById('hamburger');
     const navMenu = document.getElementById('nav-menu');
     
     if (hamburger && navMenu) {
         hamburger.addEventListener('click', function() {
+            const isExpanded = hamburger.getAttribute('aria-expanded') === 'true';
             hamburger.classList.toggle('active');
             navMenu.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', !isExpanded);
         });
         
         // Close mobile menu when clicking on a link
@@ -16,7 +23,18 @@ document.addEventListener('DOMContentLoaded', function() {
             link.addEventListener('click', () => {
                 hamburger.classList.remove('active');
                 navMenu.classList.remove('active');
+                hamburger.setAttribute('aria-expanded', 'false');
             });
+        });
+        
+        // Close mobile menu on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && navMenu.classList.contains('active')) {
+                hamburger.classList.remove('active');
+                navMenu.classList.remove('active');
+                hamburger.setAttribute('aria-expanded', 'false');
+                hamburger.focus();
+            }
         });
     }
     
@@ -35,15 +53,58 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Navbar background change on scroll
+    // Navbar background change on scroll (debounced for performance)
     const navbar = document.getElementById('navbar');
-    window.addEventListener('scroll', function() {
+    const handleScroll = debounce(function() {
         if (window.scrollY > 100) {
             navbar.style.backgroundColor = 'rgba(26, 36, 59, 0.98)';
         } else {
             navbar.style.backgroundColor = 'rgba(26, 36, 59, 0.95)';
         }
-    });
+    }, 10);
+    
+    window.addEventListener('scroll', handleScroll);
+    
+    // Lazy loading for images
+    const lazyImages = document.querySelectorAll('img[data-src]');
+    
+    if ('IntersectionObserver' in window) {
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    img.src = img.dataset.src;
+                    img.classList.remove('lazy');
+                    imageObserver.unobserve(img);
+                }
+            });
+        });
+        
+        lazyImages.forEach(img => imageObserver.observe(img));
+    } else {
+        // Fallback for browsers without IntersectionObserver
+        lazyImages.forEach(img => {
+            img.src = img.dataset.src;
+            img.classList.remove('lazy');
+        });
+    }
+    
+    // Performance optimization: Debounce scroll events
+    function debounce(func, wait, immediate) {
+        let timeout;
+        return function executedFunction() {
+            const context = this;
+            const args = arguments;
+            const later = function() {
+                timeout = null;
+                if (!immediate) func.apply(context, args);
+            };
+            const callNow = immediate && !timeout;
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+            if (callNow) func.apply(context, args);
+        };
+    }
     
     // Scroll animations
     const observerOptions = {
@@ -75,39 +136,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const formData = new FormData(this);
             const data = Object.fromEntries(formData);
             
-            // Basic validation
-            if (!data.name || !data.email || !data.zip) {
-                showMessage('Please fill in all required fields.', 'error');
-                return;
-            }
+            // Convert interests checkboxes to array
+            const interests = Array.from(this.querySelectorAll('input[name="interests"]:checked'))
+                .map(cb => cb.value);
+            data.interests = interests;
             
-            // Email validation
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(data.email)) {
-                showMessage('Please enter a valid email address.', 'error');
-                return;
-            }
-            
-            // ZIP code validation
-            const zipRegex = /^\d{5}(-\d{4})?$/;
-            if (!zipRegex.test(data.zip)) {
-                showMessage('Please enter a valid ZIP code.', 'error');
-                return;
-            }
-            
-            // Show loading state
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Signing Up...';
-            submitBtn.disabled = true;
-            
-            // Simulate form submission (replace with actual API call)
-            setTimeout(() => {
-                showMessage('Thank you for signing up! We\'ll be in touch soon.', 'success');
-                this.reset();
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            }, 2000);
+            // Submit to backend
+            submitFormToBackend(data, 'volunteer');
         });
     }
     
@@ -121,32 +156,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const formData = new FormData(this);
             const data = Object.fromEntries(formData);
             
-            // Basic validation
-            if (!data.name || !data.email || !data.message) {
-                showMessage('Please fill in all required fields.', 'error');
-                return;
-            }
-            
-            // Email validation
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(data.email)) {
-                showMessage('Please enter a valid email address.', 'error');
-                return;
-            }
-            
-            // Show loading state
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Sending...';
-            submitBtn.disabled = true;
-            
-            // Simulate form submission (replace with actual API call)
-            setTimeout(() => {
-                showMessage('Thank you for your message! We\'ll get back to you soon.', 'success');
-                this.reset();
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            }, 2000);
+            // Submit to backend
+            submitFormToBackend(data, 'contact');
         });
     }
     
@@ -353,6 +364,141 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.transform = 'translateY(0) scale(1)';
         });
     });
+    
+    // Analytics and tracking functions
+    function initializeAnalytics() {
+        // Generate or retrieve session ID
+        let sessionId = sessionStorage.getItem('campaign_session_id');
+        if (!sessionId) {
+            sessionId = generateSessionId();
+            sessionStorage.setItem('campaign_session_id', sessionId);
+        }
+        window.campaignSessionId = sessionId;
+    }
+    
+    function generateSessionId() {
+        return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    }
+    
+    function trackPageView() {
+        const data = {
+            page_url: window.location.href,
+            referrer: document.referrer,
+            session_id: window.campaignSessionId
+        };
+        
+        fetch('/api/analytics/track', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        }).catch(err => {
+            console.log('Analytics tracking unavailable:', err.message);
+        });
+    }
+    
+    // Enhanced form submission with backend integration
+    function submitFormToBackend(formData, formType) {
+        const submitButton = document.querySelector(`#${formType}-form button[type="submit"]`);
+        const originalText = submitButton.textContent;
+        
+        // Show loading state
+        submitButton.textContent = formType === 'volunteer' ? 'Signing Up...' : 'Sending...';
+        submitButton.disabled = true;
+        
+        fetch(`/api/forms/${formType}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccessMessage(data.message);
+                document.getElementById(`${formType}-form`).reset();
+            } else if (data.errors) {
+                showFormErrors(data.errors, formType);
+            } else {
+                throw new Error(data.error || 'Submission failed');
+            }
+        })
+        .catch(error => {
+            console.error('Form submission error:', error);
+            showErrorMessage('There was an error submitting your form. Please try again or contact us directly.');
+        })
+        .finally(() => {
+            submitButton.textContent = originalText;
+            submitButton.disabled = false;
+        });
+    }
+    
+    function showSuccessMessage(message) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'success-message';
+        alertDiv.style.cssText = `
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            font-weight: 500;
+        `;
+        alertDiv.textContent = message;
+        
+        const form = document.querySelector('.form');
+        form.parentNode.insertBefore(alertDiv, form);
+        
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 10000);
+        
+        // Scroll to message
+        alertDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    
+    function showErrorMessage(message) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'error-message';
+        alertDiv.style.cssText = `
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            font-weight: 500;
+        `;
+        alertDiv.textContent = message;
+        
+        const form = document.querySelector('.form');
+        form.parentNode.insertBefore(alertDiv, form);
+        
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 10000);
+    }
+    
+    function showFormErrors(errors, formType) {
+        errors.forEach(error => {
+            const field = document.querySelector(`#${formType}-form [name="${error.param}"]`);
+            if (field) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'field-error';
+                errorDiv.style.cssText = 'color: #B22222; font-size: 14px; margin-top: 5px;';
+                errorDiv.textContent = error.msg;
+                field.parentNode.appendChild(errorDiv);
+                
+                // Remove error on input
+                field.addEventListener('input', function() {
+                    errorDiv.remove();
+                }, { once: true });
+            }
+        });
+    }
     
     // Form field focus effects
     document.querySelectorAll('.form-group input, .form-group textarea').forEach(field => {

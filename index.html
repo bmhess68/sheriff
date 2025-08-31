@@ -21,7 +21,44 @@
     <meta property="twitter:description" content="Dedicated to Community Safety, School & Youth Engagement, Historic Preservation, and Building Community Trust">
     <meta property="twitter:image" content="https://putnamcountysheriff.com/assets/images/hero-bg.jpg">
 
-    <title>Putnam County Sheriff Campaign - Community Safety & Trust</title>
+    <title>Brian Hess for Putnam County Sheriff - Community Safety & Trust</title>
+    
+    <!-- Additional Meta Tags for SEO -->
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="en-US">
+    <meta name="geo.region" content="US-NY">
+    <meta name="geo.placename" content="Putnam County, New York">
+    <meta name="theme-color" content="#B22222">
+    
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Brian M. Hess",
+        "jobTitle": "Candidate for Putnam County Sheriff",
+        "affiliation": {
+            "@type": "Organization",
+            "name": "Committee to Elect Brian Hess for Putnam County Sheriff"
+        },
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Patterson",
+            "addressRegion": "NY",
+            "postalCode": "12563",
+            "addressCountry": "US"
+        },
+        "url": "https://putnamcountysheriff.com",
+        "sameAs": [
+            "https://www.facebook.com/HessForSheriff",
+            "https://www.instagram.com/HessForSheriff",
+            "https://www.linkedin.com/in/HessForSheriff"
+        ],
+        "knowsAbout": ["Law Enforcement", "Community Safety", "School Safety", "Crime Prevention"],
+        "alumniOf": "Westchester County Police Department",
+        "award": "25+ years of progressive law enforcement experience"
+    }
+    </script>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,40 +75,46 @@
     <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
 </head>
 <body>
+    <!-- Skip Links for Accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
     <!-- Navigation -->
-    <nav class="navbar" id="navbar">
+    <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
         <div class="nav-container">
             <div class="nav-logo">
                 <img src="assets/images/logo.svg" alt="Hess for Sheriff Logo" class="logo-img">
                 <span class="logo-text">Hess for Sheriff</span>
             </div>
             
-            <div class="nav-menu" id="nav-menu">
-                <a href="#home" class="nav-link">Home</a>
-                <a href="#about" class="nav-link">About</a>
-                <a href="#issues" class="nav-link">Issues</a>
-                <a href="#endorsements" class="nav-link">Endorsements</a>
-                <a href="#news" class="nav-link">News & Media</a>
-                <a href="#gallery" class="nav-link">Gallery</a>
-                <a href="#media-kit" class="nav-link">Media Kit</a>
-                <a href="#signup" class="nav-link">Sign Up</a>
-                <a href="#contact" class="nav-link">Contact</a>
+            <div class="nav-menu" id="nav-menu" role="menubar">
+                <a href="#home" class="nav-link" role="menuitem">Home</a>
+                <a href="#about" class="nav-link" role="menuitem">About</a>
+                <a href="#issues" class="nav-link" role="menuitem">Issues</a>
+                <a href="#endorsements" class="nav-link" role="menuitem">Endorsements</a>
+                <a href="#news" class="nav-link" role="menuitem">News & Media</a>
+                <a href="#gallery" class="nav-link" role="menuitem">Gallery</a>
+                <a href="#media-kit" class="nav-link" role="menuitem">Media Kit</a>
+                <a href="#signup" class="nav-link" role="menuitem">Sign Up</a>
+                <a href="#contact" class="nav-link" role="menuitem">Contact</a>
             </div>
             
-            <div class="nav-social">
-                <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
-                <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-                <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+            <div class="nav-social" aria-label="Social media links">
+                <a href="#" class="social-link" aria-label="Follow us on Facebook"><i class="fab fa-facebook" aria-hidden="true"></i></a>
+                <a href="#" class="social-link" aria-label="Follow us on Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+                <a href="#" class="social-link" aria-label="Connect with us on LinkedIn"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
             </div>
             
-            <div class="hamburger" id="hamburger">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </div>
+            <button class="hamburger" id="hamburger" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="nav-menu">
+                <span class="bar" aria-hidden="true"></span>
+                <span class="bar" aria-hidden="true"></span>
+                <span class="bar" aria-hidden="true"></span>
+            </button>
         </div>
     </nav>
 
+    <!-- Main Content -->
+    <main id="main-content">
+    
     <!-- Hero Section -->
     <section id="home" class="hero">
         <div class="hero-background"></div>
@@ -604,6 +647,8 @@
             </div>
         </div>
     </footer>
+    
+    </main>
 
     <!-- Scripts -->
     <script src="assets/js/main.js"></script>
