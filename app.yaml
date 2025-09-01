@@ -5,12 +5,21 @@ services:
   source_dir: /
   github:
     repo: bmhess68/sheriff
-    branch: main
-  run_command: npm start
+    branch: stripe-donation-integration
+  run_command: npm run simple
   environment_slug: node-js
   instance_count: 1
   instance_size_slug: basic-xxs
   envs:
+  - key: STRIPE_SECRET_KEY
+    value: 
+    type: SECRET
+  - key: STRIPE_PUBLISHABLE_KEY
+    value: 
+    type: SECRET
+  - key: STRIPE_WEBHOOK_SECRET
+    value: 
+    type: SECRET
   - key: SENDGRID_API_KEY
     value: 
     type: SECRET

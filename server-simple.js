@@ -17,7 +17,20 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+// Serve static files with Stripe key injection for index.html
 app.use(express.static('.'));
+
+// Inject Stripe publishable key into index.html
+app.get('/', (req, res) => {
+    const fs = require('fs');
+    let html = fs.readFileSync('./index.html', 'utf8');
+    
+    // Inject Stripe publishable key
+    const stripeKey = process.env.STRIPE_PUBLISHABLE_KEY || 'pk_test_placeholder';
+    html = html.replace('</head>', `    <script>window.STRIPE_PUBLISHABLE_KEY = '${stripeKey}';</script>\n</head>`);
+    
+    res.send(html);
+});
 
 // Simple in-memory storage (for demo - in production use a database)
 let submissions = [];

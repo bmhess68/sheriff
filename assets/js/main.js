@@ -162,7 +162,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Stripe Integration
-    const stripe = Stripe('pk_test_51234567890abcdef'); // Replace with your actual publishable key
+    // Note: In production, the publishable key should be injected by the server
+    // For now, this is a placeholder that needs to be replaced with the actual key
+    const stripe = Stripe(window.STRIPE_PUBLISHABLE_KEY || 'pk_test_placeholder');
     
     // Donation Button Handling
     document.querySelectorAll('.donate-btn').forEach(button => {
