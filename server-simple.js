@@ -168,9 +168,9 @@ app.post('/api/create-payment-intent', simpleRateLimit, async (req, res) => {
             return res.status(400).json({ error: 'Invalid amount' });
         }
 
-        // FEC contribution limit check ($2,800 per election)
-        if (amount > 280000) { // $2,800 in cents
-            return res.status(400).json({ error: 'Amount exceeds legal contribution limit of $2,800' });
+        // NYS contribution limit check for Putnam County ($1,500 per election)
+        if (amount > 150000) { // $1,500 in cents
+            return res.status(400).json({ error: 'Amount exceeds legal contribution limit of $1,500 for Putnam County Sheriff' });
         }
 
         const paymentIntent = await stripe.paymentIntents.create({

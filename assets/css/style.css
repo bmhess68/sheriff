@@ -886,21 +886,23 @@ section {
 }
 
 .donation-info {
-    background: var(--navy-charcoal);
-    color: var(--white);
+    background: var(--light-gray);
+    color: var(--navy-charcoal);
+    border: 2px solid var(--sheriff-red);
     padding: 2rem;
     border-radius: 10px;
     font-size: 0.9rem;
 }
 
 .donation-info h3 {
-    color: var(--white);
+    color: var(--sheriff-red);
     margin-bottom: 1rem;
 }
 
 .donation-info p {
     margin-bottom: 0.75rem;
     line-height: 1.5;
+    color: var(--navy-charcoal);
 }
 
 /* Sign Up Section */
