@@ -161,25 +161,28 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Stripe Integration
+    const stripe = Stripe('pk_test_51234567890abcdef'); // Replace with your actual publishable key
+    
     // Donation Button Handling
-    document.querySelectorAll('.donation-card button').forEach(button => {
+    document.querySelectorAll('.donate-btn').forEach(button => {
         button.addEventListener('click', function() {
             const amount = this.getAttribute('data-amount');
-            handleDonation(amount);
+            initiateDonation(amount);
         });
     });
     
     // Custom donation amount
-    const customDonateBtn = document.getElementById('custom-donate');
+    const customDonateBtn = document.getElementById('custom-donate-btn');
     const customAmountInput = document.getElementById('custom-amount');
     
     if (customDonateBtn && customAmountInput) {
         customDonateBtn.addEventListener('click', function() {
-            const amount = customAmountInput.value;
-            if (amount && amount > 0) {
-                handleDonation(amount);
+            const amount = customAmountInput.value * 100; // Convert to cents
+            if (amount >= 100) { // Minimum $1
+                initiateDonation(amount);
             } else {
-                showMessage('Please enter a valid donation amount.', 'error');
+                showMessage('Please enter a minimum donation of $1.', 'error');
             }
         });
     }
@@ -226,21 +229,62 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     }
     
-    function handleDonation(amount) {
-        // Show donation modal or redirect to payment processor
-        const isRecurring = document.getElementById('recurring')?.checked || false;
-        
-        // For now, show a message (replace with actual payment integration)
-        const message = isRecurring 
-            ? `Thank you for your recurring donation of $${amount}! Redirecting to secure payment...`
-            : `Thank you for your donation of $${amount}! Redirecting to secure payment...`;
-        
-        showMessage(message, 'success');
-        
-        // Simulate redirect to payment processor
-        setTimeout(() => {
-            alert('This would redirect to Stripe or another payment processor in production.');
-        }, 2000);
+    async function initiateDonation(amount) {
+        try {
+            // Show loading state
+            const buttons = document.querySelectorAll('.donate-btn, #custom-donate-btn');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.textContent = 'Processing...';
+            });
+
+            const response = await fetch('/api/create-payment-intent', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    amount: amount,
+                    currency: 'usd'
+                })
+            });
+
+            const { clientSecret } = await response.json();
+
+            const { error } = await stripe.confirmCardPayment(clientSecret, {
+                payment_method: {
+                    card: {
+                        // This will prompt for card details
+                    }
+                }
+            });
+
+            if (error) {
+                console.error('Payment failed:', error);
+                showMessage('Payment failed. Please try again.', 'error');
+            } else {
+                showMessage('Thank you for your donation! Your contribution helps build a safer Putnam County.', 'success');
+                // Clear custom amount if used
+                if (customAmountInput) {
+                    customAmountInput.value = '';
+                }
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showMessage('There was an error processing your donation. Please try again.', 'error');
+        } finally {
+            // Reset button states
+            const buttons = document.querySelectorAll('.donate-btn, #custom-donate-btn');
+            buttons.forEach(btn => {
+                btn.disabled = false;
+                if (btn.classList.contains('donate-btn')) {
+                    const amount = btn.getAttribute('data-amount');
+                    btn.textContent = `Donate $${amount / 100}`;
+                } else {
+                    btn.textContent = 'Donate';
+                }
+            });
+        }
     }
     
     function openLightbox(src, alt) {
