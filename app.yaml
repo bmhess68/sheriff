@@ -6,7 +6,7 @@ services:
   github:
     repo: bmhess68/sheriff
     branch: stripe-donation-integration
-  run_command: npm run simple
+  run_command: npm start
   environment_slug: node-js
   instance_count: 1
   instance_size_slug: basic-xxs
@@ -20,13 +20,13 @@ services:
   - key: STRIPE_WEBHOOK_SECRET
     value: 
     type: SECRET
-  - key: SENDGRID_API_KEY
+  - key: GMAIL_USER
+    value: info@hessforsheriff.com
+  - key: GMAIL_APP_PASSWORD
     value: 
     type: SECRET
   - key: CAMPAIGN_EMAIL
     value: info@hessforsheriff.com
-  - key: FROM_EMAIL
-    value: noreply@hessforsheriff.com
   - key: NODE_ENV
     value: production
   - key: PORT

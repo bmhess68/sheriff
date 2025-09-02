@@ -13,13 +13,13 @@ services:
   instance_count: 1
   instance_size_slug: basic-xxs
   envs:
-  - key: SENDGRID_API_KEY
-    value: ${SENDGRID_API_KEY}  # Set this in App Platform dashboard
+  - key: GMAIL_USER
+    value: info@hessforsheriff.com
+  - key: GMAIL_APP_PASSWORD
+    value: ${GMAIL_APP_PASSWORD}  # Set this in App Platform dashboard
     type: SECRET
   - key: CAMPAIGN_EMAIL
     value: info@hessforsheriff.com
-  - key: FROM_EMAIL
-    value: noreply@hessforsheriff.com
   - key: NODE_ENV
     value: production
   - key: PORT

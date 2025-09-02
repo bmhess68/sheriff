@@ -5,17 +5,8 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
 
-// Try to load SendGrid, fall back gracefully if not available
-let sgMail = null;
-try {
-    sgMail = require('@sendgrid/mail');
-    if (process.env.SENDGRID_API_KEY) {
-        sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-        console.log('✅ SendGrid configured successfully');
-    }
-} catch (error) {
-    console.log('📧 SendGrid not installed, emails will be logged to console');
-}
+// Gmail SMTP Email Service
+const emailService = require('./email-service');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -57,32 +48,9 @@ function simpleRateLimit(req, res, next) {
     next();
 }
 
-// Email sending function
+// Email sending function using Gmail SMTP
 async function sendEmail(to, subject, html, replyTo = null) {
-    if (!sgMail || !process.env.SENDGRID_API_KEY) {
-        console.log('📧 EMAIL (would be sent):', { to, subject, preview: html.substring(0, 100) + '...' });
-        return { success: true, method: 'console' };
-    }
-    
-    try {
-        const msg = {
-            to: to,
-            from: process.env.FROM_EMAIL || process.env.CAMPAIGN_EMAIL || 'noreply@hessforsheriff.com',
-            subject: subject,
-            html: html
-        };
-        
-        if (replyTo) {
-            msg.replyTo = replyTo;
-        }
-        
-        await sgMail.send(msg);
-        console.log('✅ Email sent successfully to:', to);
-        return { success: true, method: 'sendgrid' };
-    } catch (error) {
-        console.error('❌ Email error:', error.message);
-        return { success: false, error: error.message };
-    }
+    return await emailService.sendEmail(to, subject, html, replyTo);
 }
 
 // Analytics tracking
@@ -124,57 +92,22 @@ app.post('/api/forms/volunteer', simpleRateLimit, async (req, res) => {
     saveData();
     
     // Send notification email to campaign
-    const campaignNotification = `
-        <h2>🎉 New Volunteer Sign-up!</h2>
-        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <p><strong>Name:</strong> ${name}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>ZIP Code:</strong> ${zip}</p>
-            <p><strong>Phone:</strong> ${phone || 'Not provided'}</p>
-            <p><strong>Volunteer Interests:</strong> ${submission.interests || 'None specified'}</p>
-            <p><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
-        </div>
-        <p style="color: #666; font-size: 12px;">Submission ID: ${submission.id}</p>
-    `;
-    
-    await sendEmail(
-        process.env.CAMPAIGN_EMAIL || 'info@hessforsheriff.com',
-        '🎉 New Volunteer Sign-up - Hess for Sheriff',
-        campaignNotification
-    );
+    await emailService.sendCampaignNotification('volunteer', {
+        id: submission.id,
+        name: name,
+        email: email,
+        zip: zip,
+        phone: phone,
+        interests: submission.interests,
+        ip: submission.ip
+    });
     
     // Send confirmation email to volunteer
-    const volunteerConfirmation = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <div style="background: #1A243B; color: white; padding: 20px; text-align: center;">
-                <h1>Thank You for Volunteering!</h1>
-                <p style="margin: 0;">Hess for Sheriff Campaign</p>
-            </div>
-            <div style="padding: 30px 20px;">
-                <p>Dear ${name},</p>
-                <p>Thank you for signing up to volunteer for Brian Hess's campaign for Putnam County Sheriff! Your support means everything to us.</p>
-                <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #B22222; margin: 20px 0;">
-                    <p><strong>Your volunteer interests:</strong> ${submission.interests || 'We\'ll match you with opportunities'}</p>
-                </div>
-                <p>We will be in touch soon with volunteer opportunities that match your interests and availability.</p>
-                <p>Together, we can build a safer, stronger Putnam County!</p>
-                <br>
-                <p>Best regards,<br>
-                <strong>The Hess for Sheriff Campaign Team</strong></p>
-                <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
-                <p style="font-size: 12px; color: #666;">
-                    This email was sent because you signed up to volunteer at our campaign website.<br>
-                    Questions? Reply to this email or contact us at ${process.env.CAMPAIGN_EMAIL || 'info@hessforsheriff.com'}
-                </p>
-            </div>
-        </div>
-    `;
-    
-    await sendEmail(
-        email,
-        'Welcome to Team Hess! - Volunteer Confirmation',
-        volunteerConfirmation
-    );
+    await emailService.sendConfirmationEmail('volunteer', {
+        name: name,
+        email: email,
+        interests: submission.interests
+    });
     
     res.json({ 
         success: true, 
@@ -208,61 +141,21 @@ app.post('/api/forms/contact', simpleRateLimit, async (req, res) => {
     saveData();
     
     // Send notification to campaign
-    const campaignNotification = `
-        <h2>📧 New Contact Message</h2>
-        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <p><strong>From:</strong> ${name} &lt;${email}&gt;</p>
-            <p><strong>Subject:</strong> ${subject || 'No subject'}</p>
-            <div style="background: white; padding: 15px; border-left: 4px solid #B22222; margin: 15px 0;">
-                <p><strong>Message:</strong></p>
-                <p style="white-space: pre-wrap;">${message}</p>
-            </div>
-            <p><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
-        </div>
-        <p style="color: #666; font-size: 12px;">
-            Reply directly to this email to respond to ${name}<br>
-            Submission ID: ${submission.id}
-        </p>
-    `;
-    
-    await sendEmail(
-        process.env.CAMPAIGN_EMAIL || 'info@hessforsheriff.com',
-        `📧 Contact: ${subject || 'New Message'} - Hess for Sheriff`,
-        campaignNotification,
-        email // Set reply-to
-    );
+    await emailService.sendCampaignNotification('contact', {
+        id: submission.id,
+        name: name,
+        email: email,
+        subject: subject,
+        message: message,
+        ip: submission.ip
+    });
     
     // Send auto-reply to sender
-    const autoReply = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <div style="background: #1A243B; color: white; padding: 20px; text-align: center;">
-                <h1>Message Received</h1>
-                <p style="margin: 0;">Hess for Sheriff Campaign</p>
-            </div>
-            <div style="padding: 30px 20px;">
-                <p>Dear ${name},</p>
-                <p>Thank you for contacting the Hess for Sheriff campaign. We have received your message and will respond within 24-48 hours.</p>
-                <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #B22222; margin: 20px 0;">
-                    <p><strong>Your message:</strong></p>
-                    <p style="font-style: italic;">"${message.substring(0, 200)}${message.length > 200 ? '...' : ''}"</p>
-                </div>
-                <p>Your voice matters in this campaign, and we appreciate you taking the time to reach out.</p>
-                <br>
-                <p>Best regards,<br>
-                <strong>The Hess for Sheriff Campaign Team</strong></p>
-                <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
-                <p style="font-size: 12px; color: #666;">
-                    This is an automated response. For urgent matters, please call our campaign office.
-                </p>
-            </div>
-        </div>
-    `;
-    
-    await sendEmail(
-        email,
-        'Thank you for contacting Hess for Sheriff',
-        autoReply
-    );
+    await emailService.sendConfirmationEmail('contact', {
+        name: name,
+        email: email,
+        message: message
+    });
     
     res.json({ 
         success: true, 
@@ -308,7 +201,7 @@ app.get('/api/health', (req, res) => {
     res.json({ 
         status: 'healthy', 
         timestamp: new Date().toISOString(),
-        sendgrid: !!sgMail && !!process.env.SENDGRID_API_KEY,
+        email: emailService.getStatus(),
         submissions: submissions.length,
         analytics: analytics
     });
@@ -356,7 +249,7 @@ loadData();
 // Start server
 app.listen(PORT, () => {
     console.log('🚀 Sheriff Campaign Server running on port', PORT);
-    console.log('📧 SendGrid:', sgMail && process.env.SENDGRID_API_KEY ? 'CONFIGURED ✅' : 'Not configured ⚠️');
+    console.log('📧 Email Service:', emailService.isReady() ? 'Gmail SMTP CONFIGURED ✅' : 'Not configured ⚠️');
     console.log('📊 Submissions loaded:', submissions.length);
     console.log('🌐 Website: http://localhost:' + PORT);
     console.log('📈 Admin Dashboard: http://localhost:' + PORT + '/admin');

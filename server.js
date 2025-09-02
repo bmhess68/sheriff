@@ -3,7 +3,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const sqlite3 = require('sqlite3').verbose();
-const sgMail = require('@sendgrid/mail');
+const emailService = require('./email-service');
 const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
@@ -55,10 +55,7 @@ app.use(express.static('.', {
     index: 'index.html'
 }));
 
-// SendGrid configuration
-if (process.env.SENDGRID_API_KEY) {
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-}
+// Email service is automatically initialized via the module
 
 // Database setup
 const dbPath = path.join(__dirname, 'campaign_data.db');
@@ -224,52 +221,22 @@ app.post('/api/forms/volunteer', formLimiter, validateVolunteerForm, async (req,
                 [today]
             );
 
-            // Send email via SendGrid
-            if (process.env.SENDGRID_API_KEY && process.env.CAMPAIGN_EMAIL) {
-                const msg = {
-                    to: process.env.CAMPAIGN_EMAIL,
-                    from: process.env.FROM_EMAIL || process.env.CAMPAIGN_EMAIL,
-                    subject: 'New Volunteer Sign-up - Hess for Sheriff Campaign',
-                    html: `
-                        <h2>New Volunteer Sign-up</h2>
-                        <p><strong>Name:</strong> ${name}</p>
-                        <p><strong>Email:</strong> ${email}</p>
-                        <p><strong>ZIP Code:</strong> ${zip}</p>
-                        <p><strong>Phone:</strong> ${phone || 'Not provided'}</p>
-                        <p><strong>Interests:</strong> ${interestsStr || 'None specified'}</p>
-                        <p><strong>Submitted:</strong> ${moment().format('MMMM Do YYYY, h:mm:ss a')}</p>
-                        <hr>
-                        <p><small>IP: ${ip}</small></p>
-                    `
-                };
+            // Send emails via Gmail SMTP
+            await emailService.sendCampaignNotification('volunteer', {
+                id: this.lastID,
+                name: name,
+                email: email,
+                zip: zip,
+                phone: phone,
+                interests: interestsStr,
+                ip: ip
+            });
 
-                sgMail.send(msg).catch(err => {
-                    console.error('SendGrid error:', err);
-                });
-
-                // Send confirmation email to volunteer
-                const confirmationMsg = {
-                    to: email,
-                    from: process.env.FROM_EMAIL || process.env.CAMPAIGN_EMAIL,
-                    subject: 'Thank you for volunteering - Hess for Sheriff',
-                    html: `
-                        <h2>Thank You for Volunteering!</h2>
-                        <p>Dear ${name},</p>
-                        <p>Thank you for signing up to volunteer for Brian Hess's campaign for Putnam County Sheriff. Your support means everything to us!</p>
-                        <p>We will be in touch soon with volunteer opportunities that match your interests.</p>
-                        <p>Together, we can build a safer Putnam County.</p>
-                        <br>
-                        <p>Best regards,<br>
-                        The Hess for Sheriff Campaign Team</p>
-                        <hr>
-                        <p><small>This email was sent because you signed up to volunteer at our campaign website.</small></p>
-                    `
-                };
-
-                sgMail.send(confirmationMsg).catch(err => {
-                    console.error('SendGrid confirmation error:', err);
-                });
-            }
+            await emailService.sendConfirmationEmail('volunteer', {
+                name: name,
+                email: email,
+                interests: interestsStr
+            });
 
             res.json({ 
                 success: true, 
@@ -309,54 +276,21 @@ app.post('/api/forms/contact', formLimiter, validateContactForm, async (req, res
                 [today]
             );
 
-            // Send email via SendGrid
-            if (process.env.SENDGRID_API_KEY && process.env.CAMPAIGN_EMAIL) {
-                const msg = {
-                    to: process.env.CAMPAIGN_EMAIL,
-                    from: process.env.FROM_EMAIL || process.env.CAMPAIGN_EMAIL,
-                    subject: `Campaign Contact: ${subject || 'No Subject'}`,
-                    html: `
-                        <h2>New Contact Form Submission</h2>
-                        <p><strong>Name:</strong> ${name}</p>
-                        <p><strong>Email:</strong> ${email}</p>
-                        <p><strong>Subject:</strong> ${subject || 'No subject provided'}</p>
-                        <p><strong>Message:</strong></p>
-                        <div style="background: #f5f5f5; padding: 15px; border-left: 4px solid #B22222;">
-                            ${message.replace(/\n/g, '<br>')}
-                        </div>
-                        <p><strong>Submitted:</strong> ${moment().format('MMMM Do YYYY, h:mm:ss a')}</p>
-                        <hr>
-                        <p><small>IP: ${ip}</small></p>
-                    `,
-                    replyTo: email
-                };
+            // Send emails via Gmail SMTP
+            await emailService.sendCampaignNotification('contact', {
+                id: this.lastID,
+                name: name,
+                email: email,
+                subject: subject,
+                message: message,
+                ip: ip
+            });
 
-                sgMail.send(msg).catch(err => {
-                    console.error('SendGrid error:', err);
-                });
-
-                // Send auto-reply
-                const autoReply = {
-                    to: email,
-                    from: process.env.FROM_EMAIL || process.env.CAMPAIGN_EMAIL,
-                    subject: 'Thank you for contacting Hess for Sheriff',
-                    html: `
-                        <h2>Thank You for Your Message</h2>
-                        <p>Dear ${name},</p>
-                        <p>Thank you for contacting the Hess for Sheriff campaign. We have received your message and will respond within 24-48 hours.</p>
-                        <p>Your voice matters in this campaign, and we appreciate you taking the time to reach out.</p>
-                        <br>
-                        <p>Best regards,<br>
-                        The Hess for Sheriff Campaign Team</p>
-                        <hr>
-                        <p><small>This is an automated response. Please do not reply to this email.</small></p>
-                    `
-                };
-
-                sgMail.send(autoReply).catch(err => {
-                    console.error('SendGrid auto-reply error:', err);
-                });
-            }
+            await emailService.sendConfirmationEmail('contact', {
+                name: name,
+                email: email,
+                message: message
+            });
 
             res.json({ 
                 success: true, 
@@ -474,7 +408,7 @@ app.get('/api/health', (req, res) => {
     res.json({ 
         status: 'healthy', 
         timestamp: new Date().toISOString(),
-        sendgrid: !!process.env.SENDGRID_API_KEY,
+        email: emailService.getStatus(),
         database: 'connected'
     });
 });
@@ -488,7 +422,7 @@ app.use((err, req, res, next) => {
 // Start server
 app.listen(PORT, () => {
     console.log(`🚀 Sheriff Campaign Server running on port ${PORT}`);
-    console.log(`📧 SendGrid: ${process.env.SENDGRID_API_KEY ? 'Configured' : 'Not configured'}`);
+    console.log(`📧 Email Service: ${emailService.isReady() ? 'Gmail SMTP Configured' : 'Not configured'}`);
     console.log(`📊 Database: ${dbPath}`);
     console.log(`🌐 Admin Dashboard: http://localhost:${PORT}/admin`);
 });
