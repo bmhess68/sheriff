@@ -161,34 +161,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Stripe Integration
-    // Note: In production, the publishable key should be injected by the server
-    // For now, this is a placeholder that needs to be replaced with the actual key
-    const stripe = Stripe(window.STRIPE_PUBLISHABLE_KEY || 'pk_test_placeholder');
-    
-    // Donation Button Handling
-    document.querySelectorAll('.donate-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const amount = this.getAttribute('data-amount');
-            initiateDonation(amount);
-        });
-    });
-    
-    // Custom donation amount
-    const customDonateBtn = document.getElementById('custom-donate-btn');
-    const customAmountInput = document.getElementById('custom-amount');
-    
-    if (customDonateBtn && customAmountInput) {
-        customDonateBtn.addEventListener('click', function() {
-            const amount = customAmountInput.value * 100; // Convert to cents
-            if (amount >= 100) { // Minimum $1
-                initiateDonation(amount);
-            } else {
-                showMessage('Please enter a minimum donation of $1.', 'error');
-            }
-        });
-    }
-    
     // Gallery Lightbox (basic implementation)
     document.querySelectorAll('.gallery-item img').forEach(img => {
         img.addEventListener('click', function() {
@@ -231,63 +203,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     }
     
-    async function initiateDonation(amount) {
-        try {
-            // Show loading state
-            const buttons = document.querySelectorAll('.donate-btn, #custom-donate-btn');
-            buttons.forEach(btn => {
-                btn.disabled = true;
-                btn.textContent = 'Processing...';
-            });
-
-            const response = await fetch('/api/create-payment-intent', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    amount: amount,
-                    currency: 'usd'
-                })
-            });
-
-            const { clientSecret } = await response.json();
-
-            const { error } = await stripe.confirmCardPayment(clientSecret, {
-                payment_method: {
-                    card: {
-                        // This will prompt for card details
-                    }
-                }
-            });
-
-            if (error) {
-                console.error('Payment failed:', error);
-                showMessage('Payment failed. Please try again.', 'error');
-            } else {
-                showMessage('Thank you for your donation! Your contribution helps build a safer Putnam County.', 'success');
-                // Clear custom amount if used
-                if (customAmountInput) {
-                    customAmountInput.value = '';
-                }
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            showMessage('There was an error processing your donation. Please try again.', 'error');
-        } finally {
-            // Reset button states
-            const buttons = document.querySelectorAll('.donate-btn, #custom-donate-btn');
-            buttons.forEach(btn => {
-                btn.disabled = false;
-                if (btn.classList.contains('donate-btn')) {
-                    const amount = btn.getAttribute('data-amount');
-                    btn.textContent = `Donate $${amount / 100}`;
-                } else {
-                    btn.textContent = 'Donate';
-                }
-            });
-        }
-    }
     
     function openLightbox(src, alt) {
         // Create lightbox overlay
