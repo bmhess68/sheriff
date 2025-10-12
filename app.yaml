@@ -11,15 +11,6 @@ services:
   instance_count: 1
   instance_size_slug: basic-xxs
   envs:
-  - key: STRIPE_SECRET_KEY
-    value: 
-    type: SECRET
-  - key: STRIPE_PUBLISHABLE_KEY
-    value: 
-    type: SECRET
-  - key: STRIPE_WEBHOOK_SECRET
-    value: 
-    type: SECRET
   - key: GMAIL_USER
     value: info@hessforsheriff.com
   - key: GMAIL_APP_PASSWORD
