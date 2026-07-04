@@ -1,7 +1,7 @@
 {
-  "name": "putnam-county-sheriff-campaign",
+  "name": "sheriff-brian-hess",
   "version": "1.0.0",
-  "description": "Official campaign website for Putnam County Sheriff",
+  "description": "Public website for Sheriff Brian M. Hess and Putnam County community updates",
   "main": "index.html",
   "scripts": {
     "start": "python3 -m http.server 8000",
@@ -10,21 +10,21 @@
     "deploy": "echo 'Deploy to production server'"
   },
   "keywords": [
-    "campaign",
     "sheriff",
     "putnam-county",
-    "political",
+    "community",
     "website"
   ],
-  "author": "Putnam County Sheriff Campaign",
+  "author": "Sheriff Brian M. Hess",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/putnam-county-sheriff/campaign-website"
+    "url": "https://github.com/bmhess68/sheriff"
   },
-  "dependencies": {},
-  "devDependencies": {},
+  "devDependencies": {
+    "sharp": "^0.35.3"
+  },
   "engines": {
     "node": ">=12.0.0"
   }
-} 
+}
