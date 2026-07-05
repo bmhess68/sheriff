@@ -5,7 +5,7 @@ services:
   source_dir: /
   github:
     repo: bmhess68/sheriff
-    branch: stripe-donation-integration
+    branch: UpdatesScholarship
   run_command: npm start
   environment_slug: node-js
   instance_count: 1
@@ -14,7 +14,7 @@ services:
   - key: GMAIL_USER
     value: info@hessforsheriff.com
   - key: GMAIL_APP_PASSWORD
-    value: 
+    value: ${GMAIL_APP_PASSWORD}
     type: SECRET
   - key: CAMPAIGN_EMAIL
     value: info@hessforsheriff.com
@@ -28,6 +28,6 @@ static_sites:
   source_dir: /assets
   github:
     repo: bmhess68/sheriff
-    branch: main
+    branch: UpdatesScholarship
   build_command: echo "No build needed"
   output_dir: /
