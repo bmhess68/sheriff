@@ -4,6 +4,35 @@ document.addEventListener("DOMContentLoaded", () => {
     const navbar = document.getElementById("navbar");
     const navLinks = Array.from(document.querySelectorAll(".nav-link"));
 
+    const showSuccessModal = (message) => {
+        const existing = document.querySelector(".success-modal");
+        if (existing) existing.remove();
+
+        const overlay = document.createElement("div");
+        overlay.className = "success-modal";
+        overlay.innerHTML = `
+            <div class="success-dialog" role="dialog" aria-modal="true" aria-labelledby="success-title">
+                <div class="success-icon"><i class="fas fa-check"></i></div>
+                <h2 id="success-title">Application Submitted</h2>
+                <p>${message || "Thank you. Your submission was received."}</p>
+                <button type="button" class="btn btn-primary">Close</button>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+
+        const close = () => overlay.remove();
+        overlay.addEventListener("click", (event) => {
+            if (event.target === overlay) close();
+        });
+        overlay.querySelector("button")?.addEventListener("click", close);
+        document.addEventListener("keydown", function closeOnEscape(event) {
+            if (event.key === "Escape") {
+                close();
+                document.removeEventListener("keydown", closeOnEscape);
+            }
+        });
+    };
+
     if (hamburger && navMenu) {
         hamburger.addEventListener("click", () => {
             const isOpen = navMenu.classList.toggle("active");
@@ -218,6 +247,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     status.className = "form-status success";
                     status.textContent = result.message || "Thank you. Your submission was received.";
                 }
+                showSuccessModal(result.message || "Thank you. Your submission was received.");
             } catch (error) {
                 if (status) {
                     status.className = "form-status error";

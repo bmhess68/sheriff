@@ -3,263 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campaign Analytics Dashboard - Hess for Sheriff</title>
+    <title>Scholarship Admin | Sheriff Brian Hess</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            background: #f5f5f5;
-            color: #333;
-        }
-
-        .header {
-            background: #1A243B;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .header h1 {
-            margin-bottom: 10px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-
-        .stat-card h3 {
-            color: #B22222;
-            margin-bottom: 10px;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .stat-number {
-            font-size: 36px;
-            font-weight: bold;
-            color: #1A243B;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            color: #666;
-            font-size: 12px;
-        }
-
-        .dashboard-section {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-
-        .section-header {
-            background: #1A243B;
-            color: white;
-            padding: 15px 20px;
-            font-weight: bold;
-        }
-
-        .section-content {
-            padding: 20px;
-        }
-
-        .chart-container {
-            height: 300px;
-            margin: 20px 0;
-        }
-
-        .table-container {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            text-align: left;
-            padding: 12px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        th {
-            background: #f8f9fa;
-            font-weight: bold;
-            color: #1A243B;
-        }
-
-        tr:hover {
-            background: #f8f9fa;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-        }
-
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 4px;
-            margin: 10px 0;
-        }
-
-        .refresh-btn {
-            background: #B22222;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-bottom: 20px;
-        }
-
-        .refresh-btn:hover {
-            background: #931C1C;
-        }
-
-        .date-range {
-            margin-bottom: 20px;
-        }
-
-        .date-range select {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-left: 10px;
-        }
-
-        .status-indicator {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-
-        .status-online {
-            background: #28a745;
-        }
-
-        .status-offline {
-            background: #dc3545;
-        }
-
-        @media (max-width: 768px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .container {
-                padding: 10px;
-            }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #eef2f6; color: #172033; line-height: 1.5; }
+        .header { background: #172033; color: #fff; padding: 22px; }
+        .header-inner { width: min(1180px, calc(100% - 32px)); margin: 0 auto; display: flex; justify-content: space-between; gap: 16px; align-items: center; flex-wrap: wrap; }
+        .header p { color: rgba(255,255,255,.78); }
+        .container { width: min(1180px, calc(100% - 32px)); margin: 24px auto; }
+        .panel { background: #fff; border: 1px solid #d7dde6; border-radius: 8px; box-shadow: 0 8px 24px rgba(23,32,51,.08); padding: 22px; margin-bottom: 18px; }
+        .login-panel { max-width: 440px; margin: 60px auto; }
+        label { display: block; font-weight: 700; margin-bottom: 7px; }
+        input, select, textarea { width: 100%; padding: 11px; border: 1px solid #d7dde6; border-radius: 6px; font: inherit; }
+        textarea { min-height: 120px; resize: vertical; }
+        button, .button { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 10px 16px; border: 0; border-radius: 6px; background: #b22222; color: #fff; font-weight: 700; text-decoration: none; cursor: pointer; }
+        button.secondary, .button.secondary { background: #172033; }
+        button.light { background: #fff; color: #172033; border: 1px solid #d7dde6; }
+        .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+        .toolbar-left, .toolbar-right { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
+        .stat { background: #fff; border: 1px solid #d7dde6; border-left: 5px solid #b22222; border-radius: 8px; padding: 16px; }
+        .stat strong { display: block; color: #b22222; font-size: 1.8rem; line-height: 1; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; background: #fff; }
+        th, td { padding: 12px; border-bottom: 1px solid #d7dde6; text-align: left; vertical-align: top; }
+        th { background: #f8f9fa; color: #172033; font-size: .85rem; text-transform: uppercase; }
+        tr { cursor: pointer; }
+        tr:hover { background: #f8f9fa; }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 999px; background: #eef2f6; color: #172033; font-weight: 700; font-size: .8rem; }
+        .status-new { background: #e8f4f8; color: #174b63; }
+        .status-reviewing, .status-needs-info { background: #fff3cd; color: #664d03; }
+        .status-awarded, .status-finalist { background: #d4edda; color: #155724; }
+        .status-declined, .status-archived { background: #f8d7da; color: #721c24; }
+        .detail-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, .65fr); gap: 18px; }
+        .field-list { display: grid; gap: 10px; }
+        .field { border-bottom: 1px solid #eef2f6; padding-bottom: 10px; }
+        .field strong { display: block; color: #3b4a61; font-size: .85rem; text-transform: uppercase; margin-bottom: 3px; }
+        .message { padding: 12px; border-radius: 6px; margin-top: 12px; font-weight: 700; }
+        .message.error { background: #f8d7da; color: #721c24; }
+        .message.success { background: #d4edda; color: #155724; }
+        .hidden { display: none !important; }
+        .empty { color: #3b4a61; padding: 24px; text-align: center; }
+        @media (max-width: 860px) {
+            .stats-grid, .detail-grid { grid-template-columns: 1fr; }
+            .header-inner { align-items: flex-start; }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Campaign Analytics Dashboard</h1>
-        <p>Hess for Sheriff - Real-time Statistics & Form Submissions</p>
-    </div>
-
-    <div class="container">
-        <button class="refresh-btn" onclick="loadDashboard()">🔄 Refresh Data</button>
-        
-        <div class="date-range">
-            <label>Chart Period:</label>
-            <select id="chartPeriod" onchange="loadChart()">
-                <option value="7">Last 7 Days</option>
-                <option value="30" selected>Last 30 Days</option>
-                <option value="90">Last 90 Days</option>
-            </select>
+    <header class="header">
+        <div class="header-inner">
+            <div>
+                <h1>Scholarship Admin</h1>
+                <p>View applications, download CSVs, and manage review status.</p>
+            </div>
+            <button class="light hidden" id="logoutButton" type="button">Log Out</button>
         </div>
+    </header>
 
-        <!-- System Status -->
-        <div class="dashboard-section">
-            <div class="section-header">
-                <span class="status-indicator" id="statusIndicator"></span>
-                System Status
-            </div>
-            <div class="section-content">
-                <div id="systemStatus" class="loading">Checking system status...</div>
-            </div>
-        </div>
+    <main class="container">
+        <section class="panel login-panel" id="loginPanel">
+            <h2>Admin Login</h2>
+            <p style="margin: 8px 0 18px; color: #3b4a61;">Enter the admin password configured in DigitalOcean.</p>
+            <form id="loginForm">
+                <label for="password">Password</label>
+                <input id="password" name="password" type="password" autocomplete="current-password" required>
+                <button type="submit" style="margin-top: 14px;">Log In</button>
+                <div id="loginMessage"></div>
+            </form>
+        </section>
 
-        <!-- Statistics Grid -->
-        <div class="stats-grid" id="statsGrid">
-            <div class="stat-card">
-                <h3>Today</h3>
-                <div class="stat-number" id="todayVisitors">-</div>
-                <div class="stat-label">Unique Visitors</div>
+        <section id="dashboard" class="hidden">
+            <div class="stats-grid">
+                <div class="stat"><strong id="totalCount">0</strong><span>Total submissions</span></div>
+                <div class="stat"><strong id="scholarshipCount">0</strong><span>Scholarship applications</span></div>
+                <div class="stat"><strong id="newCount">0</strong><span>New / unreviewed</span></div>
+                <div class="stat"><strong id="emailStatus">-</strong><span>Email status</span></div>
             </div>
-            <div class="stat-card">
-                <h3>This Week</h3>
-                <div class="stat-number" id="weeklyVisitors">-</div>
-                <div class="stat-label">Total Visitors</div>
-            </div>
-            <div class="stat-card">
-                <h3>This Month</h3>
-                <div class="stat-number" id="monthlyVisitors">-</div>
-                <div class="stat-label">Total Visitors</div>
-            </div>
-            <div class="stat-card">
-                <h3>All Time</h3>
-                <div class="stat-number" id="totalVisitors">-</div>
-                <div class="stat-label">Total Visitors</div>
-            </div>
-            <div class="stat-card">
-                <h3>Page Views</h3>
-                <div class="stat-number" id="totalViews">-</div>
-                <div class="stat-label">All Time</div>
-            </div>
-            <div class="stat-card">
-                <h3>Form Submissions</h3>
-                <div class="stat-number" id="totalSubmissions">-</div>
-                <div class="stat-label">All Time</div>
-            </div>
-        </div>
 
-        <!-- Visitor Chart -->
-        <div class="dashboard-section">
-            <div class="section-header">📊 Daily Visitors Chart</div>
-            <div class="section-content">
-                <canvas id="visitorsChart" class="chart-container"></canvas>
+            <div class="panel">
+                <div class="toolbar">
+                    <div class="toolbar-left">
+                        <button type="button" id="refreshButton">Refresh</button>
+                        <select id="typeFilter" aria-label="Filter submissions">
+                            <option value="">All submissions</option>
+                            <option value="scholarship">Scholarship only</option>
+                            <option value="contact">Contact only</option>
+                            <option value="volunteer">Volunteer only</option>
+                        </select>
+                    </div>
+                    <div class="toolbar-right">
+                        <a class="button secondary" id="csvButton" href="#">Download CSV</a>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <!-- Recent Form Submissions -->
-        <div class="dashboard-section">
-            <div class="section-header">📝 Recent Form Submissions</div>
-            <div class="section-content">
-                <div class="table-container">
+            <div class="panel">
+                <div class="table-wrap">
                     <table>
                         <thead>
                             <tr>
@@ -267,198 +107,214 @@
                                 <th>Type</th>
                                 <th>Name</th>
                                 <th>Email</th>
-                                <th>Location</th>
-                                <th>Message/Interests</th>
+                                <th>School</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody id="submissionsTable">
-                            <tr><td colspan="6" class="loading">Loading form submissions...</td></tr>
+                            <tr><td colspan="6" class="empty">Loading submissions...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
-    </div>
+
+            <section class="panel hidden" id="detailPanel">
+                <div class="toolbar" style="margin-bottom: 16px;">
+                    <h2 id="detailTitle">Submission</h2>
+                    <button type="button" class="light" id="closeDetailButton">Close</button>
+                </div>
+                <div class="detail-grid">
+                    <div class="field-list" id="detailFields"></div>
+                    <form id="reviewForm">
+                        <label for="status">Review Status</label>
+                        <select id="status" name="status">
+                            <option value="new">New</option>
+                            <option value="reviewing">Reviewing</option>
+                            <option value="needs-info">Needs Info</option>
+                            <option value="finalist">Finalist</option>
+                            <option value="awarded">Awarded</option>
+                            <option value="declined">Declined</option>
+                            <option value="archived">Archived</option>
+                        </select>
+                        <label for="notes" style="margin-top: 14px;">Internal Notes</label>
+                        <textarea id="notes" name="notes"></textarea>
+                        <button type="submit" style="margin-top: 14px;">Save Review</button>
+                        <div id="reviewMessage"></div>
+                        <div id="attachmentLinks" style="display: grid; gap: 10px; margin-top: 18px;"></div>
+                    </form>
+                </div>
+            </section>
+        </section>
+    </main>
 
     <script>
-        // Global variables
-        let chart = null;
+        const tokenKey = 'hess_admin_token';
+        let submissions = [];
+        let selectedSubmission = null;
 
-        // Initialize dashboard
-        document.addEventListener('DOMContentLoaded', function() {
-            loadDashboard();
-            setInterval(loadStats, 60000); // Refresh stats every minute
+        const token = () => sessionStorage.getItem(tokenKey);
+        const authHeaders = () => ({ Authorization: `Bearer ${token()}` });
+        const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+        const statusClass = (status) => `badge status-${status || 'new'}`;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('loginForm').addEventListener('submit', login);
+            document.getElementById('logoutButton').addEventListener('click', logout);
+            document.getElementById('refreshButton').addEventListener('click', loadDashboard);
+            document.getElementById('typeFilter').addEventListener('change', loadSubmissions);
+            document.getElementById('closeDetailButton').addEventListener('click', () => document.getElementById('detailPanel').classList.add('hidden'));
+            document.getElementById('reviewForm').addEventListener('submit', saveReview);
+
+            if (token()) showDashboard();
         });
 
+        async function login(event) {
+            event.preventDefault();
+            const message = document.getElementById('loginMessage');
+            message.className = '';
+            message.textContent = '';
+
+            const response = await fetch('/api/admin/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: document.getElementById('password').value })
+            });
+            const result = await response.json();
+
+            if (!response.ok) {
+                message.className = 'message error';
+                message.textContent = result.error || 'Login failed.';
+                return;
+            }
+
+            sessionStorage.setItem(tokenKey, result.token);
+            showDashboard();
+        }
+
+        function logout() {
+            sessionStorage.removeItem(tokenKey);
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('logoutButton').classList.add('hidden');
+            document.getElementById('loginPanel').classList.remove('hidden');
+        }
+
+        function showDashboard() {
+            document.getElementById('loginPanel').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            document.getElementById('logoutButton').classList.remove('hidden');
+            loadDashboard();
+        }
+
         async function loadDashboard() {
-            await Promise.all([
-                checkSystemStatus(),
-                loadStats(),
-                loadChart(),
-                loadSubmissions()
-            ]);
+            await Promise.all([loadHealth(), loadSubmissions()]);
         }
 
-        async function checkSystemStatus() {
-            try {
-                const response = await fetch('/api/health');
-                const data = await response.json();
-                
-                const statusDiv = document.getElementById('systemStatus');
-                const indicator = document.getElementById('statusIndicator');
-                
-                if (data.status === 'healthy') {
-                    indicator.className = 'status-indicator status-online';
-                    statusDiv.innerHTML = `
-                        <strong>✅ System Online</strong><br>
-                        Server: Running<br>
-                        Database: Connected<br>
-                        SendGrid: ${data.sendgrid ? 'Configured' : 'Not configured'}<br>
-                        Last Updated: ${new Date(data.timestamp).toLocaleString()}
-                    `;
-                } else {
-                    indicator.className = 'status-indicator status-offline';
-                    statusDiv.innerHTML = '<strong>❌ System Issues Detected</strong>';
-                }
-            } catch (error) {
-                const statusDiv = document.getElementById('systemStatus');
-                const indicator = document.getElementById('statusIndicator');
-                indicator.className = 'status-indicator status-offline';
-                statusDiv.innerHTML = '<strong>❌ Unable to connect to server</strong>';
-            }
-        }
-
-        async function loadStats() {
-            try {
-                const response = await fetch('/api/analytics/stats');
-                const data = await response.json();
-                
-                document.getElementById('todayVisitors').textContent = data.today?.unique_visitors || 0;
-                document.getElementById('weeklyVisitors').textContent = data.weekly?.weekly_visitors || 0;
-                document.getElementById('monthlyVisitors').textContent = data.monthly?.monthly_visitors || 0;
-                document.getElementById('totalVisitors').textContent = data.total?.total_visitors || 0;
-                document.getElementById('totalViews').textContent = data.total?.total_views || 0;
-                document.getElementById('totalSubmissions').textContent = data.total?.total_submissions || 0;
-                
-            } catch (error) {
-                console.error('Failed to load statistics:', error);
-                showError('Failed to load statistics');
-            }
-        }
-
-        async function loadChart() {
-            const period = document.getElementById('chartPeriod').value;
-            
-            try {
-                const response = await fetch(`/api/analytics/daily?days=${period}`);
-                const data = await response.json();
-                
-                const canvas = document.getElementById('visitorsChart');
-                const ctx = canvas.getContext('2d');
-                
-                // Clear previous chart
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
-                if (data.length === 0) {
-                    ctx.font = '16px Arial';
-                    ctx.fillStyle = '#666';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('No data available for this period', canvas.width / 2, canvas.height / 2);
-                    return;
-                }
-                
-                // Simple chart drawing
-                const maxVisitors = Math.max(...data.map(d => d.unique_visitors)) || 1;
-                const chartWidth = canvas.width - 80;
-                const chartHeight = canvas.height - 60;
-                const barWidth = chartWidth / data.length;
-                
-                // Draw bars
-                data.forEach((day, index) => {
-                    const barHeight = (day.unique_visitors / maxVisitors) * chartHeight;
-                    const x = 40 + index * barWidth;
-                    const y = canvas.height - 30 - barHeight;
-                    
-                    ctx.fillStyle = '#B22222';
-                    ctx.fillRect(x, y, barWidth - 2, barHeight);
-                    
-                    // Draw date labels
-                    ctx.fillStyle = '#666';
-                    ctx.font = '10px Arial';
-                    ctx.textAlign = 'center';
-                    const date = new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                    ctx.fillText(date, x + barWidth / 2, canvas.height - 5);
-                    
-                    // Draw visitor count
-                    if (day.unique_visitors > 0) {
-                        ctx.fillStyle = '#fff';
-                        ctx.font = '8px Arial';
-                        ctx.fillText(day.unique_visitors, x + barWidth / 2, y - 5);
-                    }
-                });
-                
-                // Draw y-axis
-                ctx.strokeStyle = '#ddd';
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.moveTo(40, 30);
-                ctx.lineTo(40, canvas.height - 30);
-                ctx.stroke();
-                
-            } catch (error) {
-                console.error('Failed to load chart:', error);
-                showError('Failed to load chart data');
-            }
+        async function loadHealth() {
+            const response = await fetch('/api/health');
+            const data = await response.json();
+            document.getElementById('emailStatus').textContent = data.email?.configured ? 'On' : 'Off';
         }
 
         async function loadSubmissions() {
-            try {
-                const response = await fetch('/api/forms/recent');
-                const tbody = document.getElementById('submissionsTable');
-                
-                if (!response.ok) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="error">No form submissions endpoint available yet</td></tr>';
-                    return;
-                }
-                
-                const data = await response.json();
-                
-                if (data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6">No form submissions yet</td></tr>';
-                    return;
-                }
-                
-                tbody.innerHTML = data.map(submission => `
-                    <tr>
-                        <td>${new Date(submission.submitted_at).toLocaleDateString()}</td>
-                        <td><span style="text-transform: capitalize; background: ${submission.type === 'volunteer' ? '#e8f5e8' : '#e8f4f8'}; padding: 2px 6px; border-radius: 3px; font-size: 11px;">${submission.type}</span></td>
-                        <td>${submission.name}</td>
-                        <td>${submission.email}</td>
-                        <td>${submission.zip_code || '-'}</td>
-                        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${submission.message || submission.interests || '-'}</td>
-                    </tr>
-                `).join('');
-                
-            } catch (error) {
-                console.error('Failed to load submissions:', error);
-                const tbody = document.getElementById('submissionsTable');
-                tbody.innerHTML = '<tr><td colspan="6" class="error">Form submissions feature coming soon</td></tr>';
+            const type = document.getElementById('typeFilter').value;
+            const response = await fetch(`/api/admin/submissions${type ? `?type=${encodeURIComponent(type)}` : ''}`, { headers: authHeaders() });
+
+            if (response.status === 401) return logout();
+            submissions = await response.json();
+
+            document.getElementById('csvButton').href = `/api/admin/submissions.csv?token=${encodeURIComponent(token())}`;
+            document.getElementById('totalCount').textContent = submissions.length;
+            document.getElementById('scholarshipCount').textContent = submissions.filter((item) => item.type === 'scholarship').length;
+            document.getElementById('newCount').textContent = submissions.filter((item) => !item.status || item.status === 'new').length;
+
+            const tbody = document.getElementById('submissionsTable');
+            if (!submissions.length) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty">No submissions yet.</td></tr>';
+                return;
             }
+
+            tbody.innerHTML = submissions.map((item) => `
+                <tr data-id="${item.id}">
+                    <td>${new Date(item.submitted_at).toLocaleString()}</td>
+                    <td><span class="badge">${escapeHtml(item.type)}</span></td>
+                    <td>${escapeHtml(item.student_name || item.name || [item.first_name, item.last_name].filter(Boolean).join(' '))}</td>
+                    <td>${escapeHtml(item.email)}</td>
+                    <td>${escapeHtml(item.school || item.zip || '-')}</td>
+                    <td><span class="${statusClass(item.status)}">${escapeHtml(item.status || 'new')}</span></td>
+                </tr>
+            `).join('');
+
+            tbody.querySelectorAll('tr[data-id]').forEach((row) => {
+                row.addEventListener('click', () => showDetail(Number(row.dataset.id)));
+            });
         }
 
-        function showError(message) {
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'error';
-            errorDiv.textContent = message;
-            document.querySelector('.container').insertBefore(errorDiv, document.querySelector('.stats-grid'));
-            
-            setTimeout(() => {
-                errorDiv.remove();
-            }, 5000);
+        function showDetail(id) {
+            selectedSubmission = submissions.find((item) => item.id === id);
+            if (!selectedSubmission) return;
+
+            document.getElementById('detailPanel').classList.remove('hidden');
+            document.getElementById('detailTitle').textContent = `${selectedSubmission.type} #${selectedSubmission.id}`;
+            document.getElementById('status').value = selectedSubmission.status || 'new';
+            document.getElementById('notes').value = selectedSubmission.notes || '';
+            document.getElementById('reviewMessage').className = '';
+            document.getElementById('reviewMessage').textContent = '';
+
+            const fields = [
+                ['Submitted', new Date(selectedSubmission.submitted_at).toLocaleString()],
+                ['Name', selectedSubmission.student_name || selectedSubmission.name || `${selectedSubmission.first_name || ''} ${selectedSubmission.last_name || ''}`],
+                ['Email', selectedSubmission.email],
+                ['Phone', selectedSubmission.phone],
+                ['Address', [selectedSubmission.address_street, selectedSubmission.address_street2, selectedSubmission.address_city, selectedSubmission.address_state, selectedSubmission.address_zip, selectedSubmission.address_country].filter(Boolean).join(', ')],
+                ['School', selectedSubmission.school],
+                ['GPA', selectedSubmission.gpa],
+                ['Other Scholarships', selectedSubmission.other_scholarships],
+                ['Extracurricular', selectedSubmission.extracurricular],
+                ['College', selectedSubmission.college],
+                ['Major', selectedSubmission.major],
+                ['Accepted', selectedSubmission.accepted],
+                ['Community Service', selectedSubmission.community_service],
+                ['Typed Signature', selectedSubmission.signature_typed],
+                ['Essay File', selectedSubmission.essay_file_name]
+            ];
+
+            document.getElementById('detailFields').innerHTML = fields
+                .filter(([, value]) => value)
+                .map(([label, value]) => `<div class="field"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(value)}</span></div>`)
+                .join('');
+
+            const links = [];
+            if (selectedSubmission.essay_file_name) links.push(`<a class="button secondary" href="/api/admin/submissions/${selectedSubmission.id}/attachments/essay?token=${encodeURIComponent(token())}">Download Essay</a>`);
+            if (selectedSubmission.signature_file_name) links.push(`<a class="button secondary" href="/api/admin/submissions/${selectedSubmission.id}/attachments/signature?token=${encodeURIComponent(token())}">Download Signature</a>`);
+            document.getElementById('attachmentLinks').innerHTML = links.join('');
         }
 
-        // Auto-refresh every 5 minutes
-        setInterval(loadDashboard, 5 * 60 * 1000);
+        async function saveReview(event) {
+            event.preventDefault();
+            if (!selectedSubmission) return;
+
+            const response = await fetch(`/api/admin/submissions/${selectedSubmission.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                body: JSON.stringify({
+                    status: document.getElementById('status').value,
+                    notes: document.getElementById('notes').value
+                })
+            });
+            const result = await response.json();
+            const message = document.getElementById('reviewMessage');
+
+            if (!response.ok) {
+                message.className = 'message error';
+                message.textContent = result.error || 'Could not save review.';
+                return;
+            }
+
+            message.className = 'message success';
+            message.textContent = 'Review saved.';
+            await loadSubmissions();
+            selectedSubmission = result.submission;
+        }
     </script>
 </body>
 </html>

@@ -20,6 +20,9 @@ services:
     value: info@hessforsheriff.com
   - key: SCHOLARSHIP_EMAIL
     value: hessscholarshipfund@gmail.com
+  - key: ADMIN_PASSWORD
+    value: ${ADMIN_PASSWORD}
+    type: SECRET
   - key: NODE_ENV
     value: production
   - key: PORT

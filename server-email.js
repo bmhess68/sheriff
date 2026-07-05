@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
+const crypto = require('crypto');
 
 // Gmail SMTP Email Service
 const emailService = require('./email-service');
@@ -45,6 +46,74 @@ let analytics = {
     submissions: 0,
     dailyStats: {}
 };
+
+const ADMIN_SESSION_MS = 12 * 60 * 60 * 1000;
+
+function getDataDir() {
+    return process.env.NODE_ENV === 'production' ? '/app/data' : '.';
+}
+
+function sanitizeFileName(value) {
+    return String(value || 'file').replace(/[^a-z0-9_.-]/gi, '-').replace(/-+/g, '-');
+}
+
+function ensureDir(dir) {
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+    }
+}
+
+function getAdminPassword() {
+    return process.env.ADMIN_PASSWORD || process.env.ADMIN_DASHBOARD_PASSWORD || '';
+}
+
+function signAdminToken(payload) {
+    const secret = getAdminPassword();
+    const body = Buffer.from(JSON.stringify(payload)).toString('base64url');
+    const signature = crypto.createHmac('sha256', secret).update(body).digest('base64url');
+    return `${body}.${signature}`;
+}
+
+function verifyAdminToken(token) {
+    const secret = getAdminPassword();
+    if (!secret || !token || !token.includes('.')) return false;
+
+    const [body, signature] = token.split('.');
+    const expected = crypto.createHmac('sha256', secret).update(body).digest('base64url');
+    const providedBuffer = Buffer.from(signature || '');
+    const expectedBuffer = Buffer.from(expected);
+
+    if (providedBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(providedBuffer, expectedBuffer)) {
+        return false;
+    }
+
+    try {
+        const payload = JSON.parse(Buffer.from(body, 'base64url').toString('utf8'));
+        return payload.exp && Date.now() < payload.exp;
+    } catch (error) {
+        return false;
+    }
+}
+
+function requireAdmin(req, res, next) {
+    const token = (req.headers.authorization || '').replace(/^Bearer\s+/i, '') || cleanText(req.query.token);
+    if (!verifyAdminToken(token)) {
+        return res.status(401).json({ error: 'Admin login required.' });
+    }
+    next();
+}
+
+function safeSubmission(submission) {
+    return {
+        ...submission,
+        ip: submission.ip ? 'stored' : ''
+    };
+}
+
+function csvEscape(value) {
+    const text = String(value ?? '');
+    return /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}
 
 // Rate limiting
 const rateLimitStore = new Map();
@@ -232,8 +301,19 @@ app.post('/api/forms/scholarship', simpleRateLimit, upload.single('essay_file'),
         return res.status(400).json({ error: 'Please complete all required scholarship fields.' });
     }
 
+    const id = submissions.length + 1;
+    const uploadDir = path.join(getDataDir(), 'scholarship_uploads', String(id));
+    ensureDir(uploadDir);
+    const essayFileName = sanitizeFileName(req.file.originalname);
+    const signatureFileName = `${sanitizeFileName(first_name)}-${sanitizeFileName(last_name)}-signature.png`;
+    const essayPath = path.join(uploadDir, essayFileName);
+    const signaturePath = path.join(uploadDir, signatureFileName);
+
+    fs.writeFileSync(essayPath, req.file.buffer);
+    fs.writeFileSync(signaturePath, signatureBuffer);
+
     const submission = {
-        id: submissions.length + 1,
+        id,
         type: 'scholarship',
         student_name: `${cleanText(first_name)} ${cleanText(last_name)}`,
         first_name: cleanText(first_name),
@@ -257,6 +337,9 @@ app.post('/api/forms/scholarship', simpleRateLimit, upload.single('essay_file'),
         essay_file_name: req.file.originalname,
         essay_file_type: req.file.mimetype,
         essay_file_size: req.file.size,
+        essay_file_path: essayPath,
+        signature_file_name: signatureFileName,
+        signature_file_path: signaturePath,
         signature_typed: cleanText(signature_typed),
         certification: cleanText(certification),
         submitted_at: new Date().toISOString(),
@@ -330,6 +413,94 @@ app.get('/api/forms/recent', (req, res) => {
     res.json(recent);
 });
 
+app.post('/api/admin/login', (req, res) => {
+    const adminPassword = getAdminPassword();
+    const submittedPassword = cleanText(req.body.password);
+
+    if (!adminPassword) {
+        return res.status(503).json({ error: 'Admin password is not configured.' });
+    }
+
+    const submittedBuffer = Buffer.from(submittedPassword);
+    const expectedBuffer = Buffer.from(adminPassword);
+    const matches = submittedBuffer.length === expectedBuffer.length && crypto.timingSafeEqual(submittedBuffer, expectedBuffer);
+
+    if (!matches) {
+        return res.status(401).json({ error: 'Incorrect password.' });
+    }
+
+    res.json({
+        success: true,
+        token: signAdminToken({ exp: Date.now() + ADMIN_SESSION_MS })
+    });
+});
+
+app.get('/api/admin/submissions', requireAdmin, (req, res) => {
+    const type = cleanText(req.query.type);
+    const filtered = submissions
+        .filter((submission) => !type || submission.type === type)
+        .sort((a, b) => new Date(b.submitted_at) - new Date(a.submitted_at))
+        .map(safeSubmission);
+
+    res.json(filtered);
+});
+
+app.get('/api/admin/submissions.csv', requireAdmin, (req, res) => {
+    const fields = [
+        'id', 'type', 'status', 'submitted_at', 'student_name', 'first_name', 'last_name', 'name', 'email', 'phone',
+        'school', 'gpa', 'other_scholarships', 'extracurricular', 'college', 'major', 'accepted',
+        'address_street', 'address_street2', 'address_city', 'address_state', 'address_zip', 'address_country',
+        'community_service', 'essay_file_name', 'signature_file_name', 'signature_typed', 'notes'
+    ];
+    const rows = [fields.join(',')].concat(
+        submissions.map((submission) => fields.map((field) => csvEscape(submission[field])).join(','))
+    );
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="scholarship-submissions.csv"');
+    res.send(rows.join('\n'));
+});
+
+app.patch('/api/admin/submissions/:id', requireAdmin, (req, res) => {
+    const id = Number(req.params.id);
+    const submission = submissions.find((item) => item.id === id);
+
+    if (!submission) {
+        return res.status(404).json({ error: 'Submission not found.' });
+    }
+
+    const allowedStatuses = new Set(['new', 'reviewing', 'needs-info', 'finalist', 'awarded', 'declined', 'archived']);
+    if (req.body.status && allowedStatuses.has(req.body.status)) {
+        submission.status = req.body.status;
+    }
+
+    if (typeof req.body.notes === 'string') {
+        submission.notes = cleanText(req.body.notes);
+    }
+
+    submission.updated_at = new Date().toISOString();
+    saveData();
+    res.json({ success: true, submission: safeSubmission(submission) });
+});
+
+app.get('/api/admin/submissions/:id/attachments/:kind', requireAdmin, (req, res) => {
+    const id = Number(req.params.id);
+    const submission = submissions.find((item) => item.id === id);
+
+    if (!submission) {
+        return res.status(404).json({ error: 'Submission not found.' });
+    }
+
+    const filePath = req.params.kind === 'essay' ? submission.essay_file_path : submission.signature_file_path;
+    const fileName = req.params.kind === 'essay' ? submission.essay_file_name : submission.signature_file_name;
+
+    if (!filePath || !fs.existsSync(filePath)) {
+        return res.status(404).json({ error: 'Attachment not found.' });
+    }
+
+    res.download(filePath, fileName || path.basename(filePath));
+});
+
 // Admin dashboard
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'admin.html'));
@@ -341,6 +512,7 @@ app.get('/api/health', (req, res) => {
         status: 'healthy', 
         timestamp: new Date().toISOString(),
         email: emailService.getStatus(),
+        admin_configured: Boolean(getAdminPassword()),
         submissions: submissions.length,
         analytics: analytics
     });
