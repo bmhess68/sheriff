@@ -852,24 +852,33 @@ section {
     gap: 7px;
 }
 
-.form-row.two-column {
+.form-row.two-column,
+.form-row.three-column {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
 }
 
-.form-row.two-column > div {
+.form-row.three-column {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.form-row.two-column > div,
+.form-row.three-column > div {
     display: grid;
     gap: 7px;
 }
 
 .application-form label,
-.checkbox-row {
+.checkbox-row,
+.choice-group legend,
+.form-section-title {
     color: var(--ink);
     font-weight: 800;
 }
 
 .application-form input,
-.application-form textarea {
+.application-form textarea,
+.application-form select {
     width: 100%;
     border: 1px solid var(--line);
     border-radius: 6px;
@@ -884,9 +893,70 @@ section {
 }
 
 .application-form input:focus,
-.application-form textarea:focus {
+.application-form textarea:focus,
+.application-form select:focus {
     outline: 2px solid rgba(178, 34, 34, 0.22);
     border-color: var(--red);
+}
+
+.form-section-title {
+    padding-top: 10px;
+    border-top: 1px solid var(--line);
+    color: var(--red);
+    font-family: "Merriweather", Georgia, serif;
+    font-size: 1.2rem;
+}
+
+.field-help {
+    color: var(--steel);
+    font-size: 0.95rem;
+}
+
+.choice-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 22px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+}
+
+.choice-group legend {
+    padding: 0 6px;
+}
+
+.choice-group label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--steel);
+}
+
+.choice-group input {
+    width: auto;
+}
+
+.signature-row {
+    align-items: start;
+}
+
+.signature-pad {
+    width: 100%;
+    height: 190px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background:
+        linear-gradient(var(--paper), var(--paper)) padding-box,
+        repeating-linear-gradient(0deg, transparent 0 43px, rgba(59, 74, 97, 0.10) 44px) border-box;
+    cursor: crosshair;
+    touch-action: none;
+}
+
+.signature-clear {
+    justify-self: start;
+    color: var(--ink);
+    border-color: var(--line);
+    background: var(--paper);
 }
 
 .checkbox-row {
@@ -1258,7 +1328,8 @@ section {
         min-height: 620px;
     }
 
-    .form-row.two-column {
+    .form-row.two-column,
+    .form-row.three-column {
         grid-template-columns: 1fr;
     }
 }

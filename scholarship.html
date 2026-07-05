@@ -136,7 +136,7 @@
                 <div class="application-copy">
                     <p class="eyebrow">Next Year Application</p>
                     <h2 class="section-title left">Scholarship Interest Form</h2>
-                    <p class="lead">Use this form to collect next-cycle applications and interest. Submissions are saved by the backend and emailed to the scholarship contact address.</p>
+                    <p class="lead">This local application mirrors the scholarship form and sends submissions directly to the scholarship contact address.</p>
                     <div class="document-links">
                         <a href="assets/documents/scholarship/Hess_Scholarship.pdf" target="_blank" rel="noopener"><i class="fas fa-file-pdf"></i><span>Scholarship Overview PDF</span></a>
                         <a href="assets/documents/scholarship/Hess Scholarship Fund Press Release.pdf" target="_blank" rel="noopener"><i class="fas fa-file-pdf"></i><span>Press Release PDF</span></a>
@@ -149,51 +149,119 @@
                     </div>
                 </div>
 
-                <form id="scholarship-form" class="application-form" data-api-form="scholarship">
+                <form id="scholarship-form" class="application-form" data-api-form="scholarship" enctype="multipart/form-data">
                     <div class="form-status" aria-live="polite"></div>
-                    <div class="form-row">
-                        <label for="student_name">Student Name *</label>
-                        <input type="text" id="student_name" name="student_name" autocomplete="name" required>
+                    <div class="form-section-title">Student Information</div>
+                    <div class="form-row two-column">
+                        <div>
+                            <label for="first_name">First Name *</label>
+                            <input type="text" id="first_name" name="first_name" autocomplete="given-name" required>
+                        </div>
+                        <div>
+                            <label for="last_name">Last Name *</label>
+                            <input type="text" id="last_name" name="last_name" autocomplete="family-name" required>
+                        </div>
                     </div>
                     <div class="form-row">
-                        <label for="email">Student Email *</label>
+                        <label for="email">Email Address *</label>
                         <input type="email" id="email" name="email" autocomplete="email" required>
                     </div>
-                    <div class="form-row two-column">
-                        <div>
-                            <label for="phone">Phone</label>
-                            <input type="tel" id="phone" name="phone" autocomplete="tel">
-                        </div>
-                        <div>
-                            <label for="school">High School *</label>
-                            <input type="text" id="school" name="school" required>
-                        </div>
+                    <div class="form-row">
+                        <label for="phone">Phone Number *</label>
+                        <input type="tel" id="phone" name="phone" autocomplete="tel" placeholder="(000) 000-0000" required>
                     </div>
-                    <div class="form-row two-column">
+                    <div class="form-row">
+                        <label for="address_street">Mailing Address *</label>
+                        <input type="text" id="address_street" name="address_street" autocomplete="address-line1" placeholder="Street Address" required>
+                    </div>
+                    <div class="form-row">
+                        <label for="address_street2">Address Line 2</label>
+                        <input type="text" id="address_street2" name="address_street2" autocomplete="address-line2" placeholder="Apartment, suite, unit">
+                    </div>
+                    <div class="form-row three-column">
                         <div>
-                            <label for="graduation_year">Graduation Year *</label>
-                            <input type="number" id="graduation_year" name="graduation_year" min="2027" max="2035" value="2027" required>
+                            <label for="address_city">City *</label>
+                            <input type="text" id="address_city" name="address_city" autocomplete="address-level2" required>
                         </div>
                         <div>
-                            <label for="post_secondary_plan">Post-Secondary Plan</label>
-                            <input type="text" id="post_secondary_plan" name="post_secondary_plan" placeholder="College, trade school, program, or undecided">
+                            <label for="address_state">State *</label>
+                            <input type="text" id="address_state" name="address_state" autocomplete="address-level1" value="NY" required>
+                        </div>
+                        <div>
+                            <label for="address_zip">Postal / Zip Code *</label>
+                            <input type="text" id="address_zip" name="address_zip" autocomplete="postal-code" required>
                         </div>
                     </div>
                     <div class="form-row">
-                        <label for="community_service">Community Service and Activities *</label>
-                        <textarea id="community_service" name="community_service" rows="4" required></textarea>
+                        <label for="address_country">Country *</label>
+                        <input type="text" id="address_country" name="address_country" autocomplete="country-name" value="United States" required>
+                    </div>
+
+                    <div class="form-section-title">Academics</div>
+                    <div class="form-row">
+                        <label for="school">Current Educational Institution *</label>
+                        <select id="school" name="school" required>
+                            <option value="">Please Select</option>
+                            <option value="Brewster High School">Brewster High School</option>
+                            <option value="Carmel High School">Carmel High School</option>
+                            <option value="Haldane High School">Haldane High School</option>
+                            <option value="Mahopac High School">Mahopac High School</option>
+                            <option value="Putnam Valley High School">Putnam Valley High School</option>
+                        </select>
                     </div>
                     <div class="form-row">
-                        <label for="leadership">Leadership Experience *</label>
-                        <textarea id="leadership" name="leadership" rows="4" required></textarea>
+                        <label for="gpa">Grade Point Average (GPA) *</label>
+                        <input type="text" id="gpa" name="gpa" inputmode="decimal" required>
+                    </div>
+                    <fieldset class="choice-group">
+                        <legend>Have you ever applied for any other scholarships? *</legend>
+                        <label><input type="radio" name="other_scholarships" value="Yes" required> Yes</label>
+                        <label><input type="radio" name="other_scholarships" value="No"> No</label>
+                    </fieldset>
+                    <fieldset class="choice-group">
+                        <legend>Have you participated in any extracurricular activities? *</legend>
+                        <label><input type="radio" name="extracurricular" value="Yes" required> Yes</label>
+                        <label><input type="radio" name="extracurricular" value="No"> No</label>
+                    </fieldset>
+
+                    <div class="form-section-title">School Details</div>
+                    <div class="form-row">
+                        <label for="college">Name of University or College You Plan to Attend *</label>
+                        <input type="text" id="college" name="college" required>
                     </div>
                     <div class="form-row">
-                        <label for="essay">Personal Statement *</label>
-                        <textarea id="essay" name="essay" rows="6" placeholder="Tell us about your goals, character, resilience, and commitment to your community." required></textarea>
+                        <label for="major">Intended Major *</label>
+                        <input type="text" id="major" name="major" required>
+                    </div>
+                    <fieldset class="choice-group">
+                        <legend>Have you been accepted? *</legend>
+                        <label><input type="radio" name="accepted" value="Yes" required> Yes</label>
+                        <label><input type="radio" name="accepted" value="No"> No</label>
+                    </fieldset>
+
+                    <div class="form-section-title">Community Service</div>
+                    <div class="form-row">
+                        <label for="community_service">Please describe any community service activities you have participated in. Include the organizations involved, your role, the length of your involvement, and the impact your service had on others and your community. *</label>
+                        <textarea id="community_service" name="community_service" rows="6" required></textarea>
+                    </div>
+
+                    <div class="form-section-title">Personal Essay: Integrity and Service</div>
+                    <div class="form-row">
+                        <label for="essay_file">Upload a 500-700 word essay *</label>
+                        <p class="field-help">Integrity and service are the foundation of strong communities. Describe how you have demonstrated these values in your life and how you intend to carry them forward in your education and future career.</p>
+                        <input type="file" id="essay_file" name="essay_file" accept=".pdf,.doc,.docx,.txt" required>
+                    </div>
+
+                    <div class="form-section-title">Signature</div>
+                    <div class="form-row signature-row">
+                        <label for="signature-pad">Signature *</label>
+                        <canvas id="signature-pad" class="signature-pad" width="640" height="190" aria-label="Signature pad"></canvas>
+                        <input type="hidden" id="signature_data" name="signature_data" required>
+                        <button class="btn btn-secondary signature-clear" type="button" data-clear-signature>Clear Signature</button>
                     </div>
                     <div class="form-row">
-                        <label for="reference">Reference or Recommender</label>
-                        <input type="text" id="reference" name="reference" placeholder="Name, relationship, and contact information">
+                        <label for="signature_typed">Typed Signature *</label>
+                        <input type="text" id="signature_typed" name="signature_typed" required>
                     </div>
                     <label class="checkbox-row">
                         <input type="checkbox" name="certification" value="yes" required>

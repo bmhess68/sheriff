@@ -102,6 +102,73 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    document.querySelectorAll(".signature-pad").forEach((canvas) => {
+        const context = canvas.getContext("2d");
+        const hiddenInput = document.getElementById("signature_data");
+        const clearButton = document.querySelector("[data-clear-signature]");
+        let drawing = false;
+        let hasSignature = false;
+
+        const resizeCanvas = () => {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            const { width, height } = canvas.getBoundingClientRect();
+            canvas.width = width * ratio;
+            canvas.height = height * ratio;
+            context.setTransform(ratio, 0, 0, ratio, 0, 0);
+            context.lineWidth = 2.5;
+            context.lineCap = "round";
+            context.lineJoin = "round";
+            context.strokeStyle = "#172033";
+        };
+
+        const position = (event) => {
+            const rect = canvas.getBoundingClientRect();
+            const point = event.touches?.[0] || event;
+            return {
+                x: point.clientX - rect.left,
+                y: point.clientY - rect.top
+            };
+        };
+
+        const start = (event) => {
+            event.preventDefault();
+            drawing = true;
+            const point = position(event);
+            context.beginPath();
+            context.moveTo(point.x, point.y);
+        };
+
+        const move = (event) => {
+            if (!drawing) return;
+            event.preventDefault();
+            const point = position(event);
+            context.lineTo(point.x, point.y);
+            context.stroke();
+            hasSignature = true;
+            if (hiddenInput) hiddenInput.value = canvas.toDataURL("image/png");
+        };
+
+        const stop = () => {
+            drawing = false;
+            if (hasSignature && hiddenInput) hiddenInput.value = canvas.toDataURL("image/png");
+        };
+
+        resizeCanvas();
+        window.addEventListener("resize", resizeCanvas);
+        canvas.addEventListener("mousedown", start);
+        canvas.addEventListener("mousemove", move);
+        window.addEventListener("mouseup", stop);
+        canvas.addEventListener("touchstart", start, { passive: false });
+        canvas.addEventListener("touchmove", move, { passive: false });
+        window.addEventListener("touchend", stop);
+
+        clearButton?.addEventListener("click", () => {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            hasSignature = false;
+            if (hiddenInput) hiddenInput.value = "";
+        });
+    });
+
     document.querySelectorAll("form[data-api-form]").forEach((form) => {
         form.addEventListener("submit", async (event) => {
             event.preventDefault();
@@ -110,11 +177,22 @@ document.addEventListener("DOMContentLoaded", () => {
             const status = form.querySelector(".form-status");
             const submitButton = form.querySelector('button[type="submit"]');
             const originalText = submitButton?.textContent || "Submit";
-            const formData = Object.fromEntries(new FormData(form).entries());
+            const signatureInput = form.querySelector("#signature_data");
+            const rawFormData = new FormData(form);
+            const isMultipart = form.enctype === "multipart/form-data";
+            const body = isMultipart ? rawFormData : JSON.stringify(Object.fromEntries(rawFormData.entries()));
 
             if (status) {
                 status.className = "form-status";
                 status.textContent = "";
+            }
+
+            if (signatureInput && !signatureInput.value) {
+                if (status) {
+                    status.className = "form-status error";
+                    status.textContent = "Please draw your signature before submitting.";
+                }
+                return;
             }
 
             if (submitButton) {
@@ -125,8 +203,8 @@ document.addEventListener("DOMContentLoaded", () => {
             try {
                 const response = await fetch(`/api/forms/${formType}`, {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(formData)
+                    headers: isMultipart ? undefined : { "Content-Type": "application/json" },
+                    body
                 });
                 const result = await response.json();
 
@@ -135,6 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 form.reset();
+                document.querySelector("[data-clear-signature]")?.click();
                 if (status) {
                     status.className = "form-status success";
                     status.textContent = result.message || "Thank you. Your submission was received.";

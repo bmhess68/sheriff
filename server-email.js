@@ -4,12 +4,32 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
+const multer = require('multer');
 
 // Gmail SMTP Email Service
 const emailService = require('./email-service');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 8 * 1024 * 1024
+    },
+    fileFilter: (req, file, cb) => {
+        const allowedTypes = new Set([
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'text/plain'
+        ]);
+        if (allowedTypes.has(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error('Essay file must be a PDF, DOC, DOCX, or TXT file.'));
+        }
+    }
+});
 
 // Middleware
 app.use(cors());
@@ -50,6 +70,12 @@ function simpleRateLimit(req, res, next) {
 
 function cleanText(value) {
     return String(value || '').trim();
+}
+
+function parseSignatureData(signatureData) {
+    const match = cleanText(signatureData).match(/^data:image\/png;base64,(.+)$/);
+    if (!match) return null;
+    return Buffer.from(match[1], 'base64');
 }
 
 // Email sending function using Gmail SMTP
@@ -169,44 +195,89 @@ app.post('/api/forms/contact', simpleRateLimit, async (req, res) => {
 });
 
 // Scholarship application submission with email
-app.post('/api/forms/scholarship', simpleRateLimit, async (req, res) => {
+app.post('/api/forms/scholarship', simpleRateLimit, upload.single('essay_file'), async (req, res) => {
     const {
-        student_name,
+        first_name,
+        last_name,
         email,
         phone,
+        address_street,
+        address_street2,
+        address_city,
+        address_state,
+        address_zip,
+        address_country,
         school,
-        graduation_year,
-        post_secondary_plan,
+        gpa,
+        other_scholarships,
+        extracurricular,
+        college,
+        major,
+        accepted,
         community_service,
-        leadership,
-        essay,
-        reference,
+        signature_data,
+        signature_typed,
         certification
     } = req.body;
 
-    if (!student_name || !email || !school || !graduation_year || !community_service || !leadership || !essay || certification !== 'yes') {
+    const signatureBuffer = parseSignatureData(signature_data);
+
+    if (
+        !first_name || !last_name || !email || !phone ||
+        !address_street || !address_city || !address_state || !address_zip || !address_country ||
+        !school || !gpa || !other_scholarships || !extracurricular ||
+        !college || !major || !accepted || !community_service ||
+        !req.file || !signatureBuffer || !signature_typed || certification !== 'yes'
+    ) {
         return res.status(400).json({ error: 'Please complete all required scholarship fields.' });
     }
 
     const submission = {
         id: submissions.length + 1,
         type: 'scholarship',
-        student_name: cleanText(student_name),
+        student_name: `${cleanText(first_name)} ${cleanText(last_name)}`,
+        first_name: cleanText(first_name),
+        last_name: cleanText(last_name),
         email: cleanText(email),
         phone: cleanText(phone),
+        address_street: cleanText(address_street),
+        address_street2: cleanText(address_street2),
+        address_city: cleanText(address_city),
+        address_state: cleanText(address_state),
+        address_zip: cleanText(address_zip),
+        address_country: cleanText(address_country),
         school: cleanText(school),
-        graduation_year: cleanText(graduation_year),
-        post_secondary_plan: cleanText(post_secondary_plan),
+        gpa: cleanText(gpa),
+        other_scholarships: cleanText(other_scholarships),
+        extracurricular: cleanText(extracurricular),
+        college: cleanText(college),
+        major: cleanText(major),
+        accepted: cleanText(accepted),
         community_service: cleanText(community_service),
-        leadership: cleanText(leadership),
-        essay: cleanText(essay),
-        reference: cleanText(reference),
+        essay_file_name: req.file.originalname,
+        essay_file_type: req.file.mimetype,
+        essay_file_size: req.file.size,
+        signature_typed: cleanText(signature_typed),
         certification: cleanText(certification),
         submitted_at: new Date().toISOString(),
-        ip: req.ip || req.connection.remoteAddress
+        ip: req.ip || req.connection.remoteAddress,
+        attachments: [
+            {
+                filename: req.file.originalname,
+                content: req.file.buffer,
+                contentType: req.file.mimetype
+            },
+            {
+                filename: `${cleanText(first_name)}-${cleanText(last_name)}-signature.png`.replace(/[^a-z0-9_.-]/gi, '-'),
+                content: signatureBuffer,
+                contentType: 'image/png'
+            }
+        ]
     };
 
-    submissions.push(submission);
+    const storedSubmission = { ...submission };
+    delete storedSubmission.attachments;
+    submissions.push(storedSubmission);
     analytics.submissions++;
     saveData();
 
@@ -218,6 +289,18 @@ app.post('/api/forms/scholarship', simpleRateLimit, async (req, res) => {
         message: 'Thank you. Your scholarship submission was received.',
         id: submission.id
     });
+});
+
+app.use((error, req, res, next) => {
+    if (error instanceof multer.MulterError) {
+        return res.status(400).json({ error: error.code === 'LIMIT_FILE_SIZE' ? 'Essay file must be 8 MB or smaller.' : error.message });
+    }
+
+    if (error) {
+        return res.status(400).json({ error: error.message || 'There was a problem processing the submission.' });
+    }
+
+    next();
 });
 
 // Get analytics stats

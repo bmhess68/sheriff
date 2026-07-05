@@ -49,12 +49,13 @@ class EmailService {
         }
     }
 
-    async sendEmail(to, subject, html, replyTo = null) {
+    async sendEmail(to, subject, html, replyTo = null, attachments = []) {
         if (!this.transporter || !this.isConfigured) {
             console.log('📧 EMAIL (would be sent):', { 
                 to, 
                 subject, 
-                preview: html.substring(0, 100) + '...' 
+                preview: html.substring(0, 100) + '...',
+                attachments: attachments.map((attachment) => attachment.filename)
             });
             return { success: true, method: 'console' };
         }
@@ -67,7 +68,8 @@ class EmailService {
                 },
                 to: to,
                 subject: subject,
-                html: html
+                html: html,
+                attachments
             };
 
             // Add reply-to if provided
@@ -191,23 +193,21 @@ class EmailService {
                             ${this.renderField('Student Name', data.student_name)}
                             ${this.renderField('Email', data.email)}
                             ${this.renderField('Phone', data.phone)}
+                            ${this.renderField('Mailing Address', `${data.address_street}${data.address_street2 ? ', ' + data.address_street2 : ''}, ${data.address_city}, ${data.address_state} ${data.address_zip}, ${data.address_country}`)}
                             ${this.renderField('High School', data.school)}
-                            ${this.renderField('Graduation Year', data.graduation_year)}
-                            ${this.renderField('Post-Secondary Plan', data.post_secondary_plan)}
-                            ${this.renderField('Reference or Recommender', data.reference)}
+                            ${this.renderField('GPA', data.gpa)}
+                            ${this.renderField('Applied for Other Scholarships', data.other_scholarships)}
+                            ${this.renderField('Extracurricular Activities', data.extracurricular)}
+                            ${this.renderField('College or University', data.college)}
+                            ${this.renderField('Intended Major', data.major)}
+                            ${this.renderField('Accepted', data.accepted)}
+                            ${this.renderField('Typed Signature', data.signature_typed)}
+                            ${this.renderField('Essay File', data.essay_file_name)}
                             ${this.renderField('Submitted', new Date().toLocaleString())}
                         </div>
                         <div style="background: white; padding: 15px; border-left: 4px solid #B22222; margin: 15px 0;">
                             <p><strong>Community Service and Activities</strong></p>
                             <p style="white-space: pre-wrap;">${this.escapeHtml(data.community_service)}</p>
-                        </div>
-                        <div style="background: white; padding: 15px; border-left: 4px solid #B22222; margin: 15px 0;">
-                            <p><strong>Leadership Experience</strong></p>
-                            <p style="white-space: pre-wrap;">${this.escapeHtml(data.leadership)}</p>
-                        </div>
-                        <div style="background: white; padding: 15px; border-left: 4px solid #B22222; margin: 15px 0;">
-                            <p><strong>Personal Statement</strong></p>
-                            <p style="white-space: pre-wrap;">${this.escapeHtml(data.essay)}</p>
                         </div>
                         <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
                         <p style="color: #666; font-size: 12px;">
@@ -218,7 +218,7 @@ class EmailService {
                 </div>
             `;
 
-            return await this.sendEmail(scholarshipEmail, subject, html, data.email);
+            return await this.sendEmail(scholarshipEmail, subject, html, data.email, data.attachments || []);
         }
     }
 
@@ -296,7 +296,7 @@ class EmailService {
                         <p>Thank you for submitting your scholarship information. Your submission has been received by the Brian Hess Scholarship Fund of Putnam County, Inc.</p>
                         <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #B22222; margin: 20px 0;">
                             <p><strong>High School:</strong> ${this.escapeHtml(data.school)}</p>
-                            <p><strong>Graduation Year:</strong> ${this.escapeHtml(data.graduation_year)}</p>
+                            <p><strong>College or University:</strong> ${this.escapeHtml(data.college)}</p>
                             <p><strong>Submission ID:</strong> ${this.escapeHtml(data.id)}</p>
                         </div>
                         <p>If additional information is needed, the scholarship committee will contact you using the email address provided.</p>
