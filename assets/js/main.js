@@ -68,7 +68,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }, sections[0]?.id || "");
 
         navLinks.forEach((link) => {
-            link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
+            const href = link.getAttribute("href") || "";
+            if (href.startsWith("#")) {
+                link.classList.toggle("active", href === `#${current}`);
+            }
         });
     };
 
@@ -96,6 +99,57 @@ document.addEventListener("DOMContentLoaded", () => {
                     document.removeEventListener("keydown", closeOnEscape);
                 }
             });
+        });
+    });
+
+    document.querySelectorAll("form[data-api-form]").forEach((form) => {
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const formType = form.dataset.apiForm;
+            const status = form.querySelector(".form-status");
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalText = submitButton?.textContent || "Submit";
+            const formData = Object.fromEntries(new FormData(form).entries());
+
+            if (status) {
+                status.className = "form-status";
+                status.textContent = "";
+            }
+
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.textContent = "Submitting...";
+            }
+
+            try {
+                const response = await fetch(`/api/forms/${formType}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(formData)
+                });
+                const result = await response.json();
+
+                if (!response.ok || !result.success) {
+                    throw new Error(result.error || "Submission failed. Please try again.");
+                }
+
+                form.reset();
+                if (status) {
+                    status.className = "form-status success";
+                    status.textContent = result.message || "Thank you. Your submission was received.";
+                }
+            } catch (error) {
+                if (status) {
+                    status.className = "form-status error";
+                    status.textContent = error.message || "There was a problem submitting the form.";
+                }
+            } finally {
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.textContent = originalText;
+                }
+            }
         });
     });
 });

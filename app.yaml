@@ -18,6 +18,8 @@ services:
     type: SECRET
   - key: CAMPAIGN_EMAIL
     value: info@hessforsheriff.com
+  - key: SCHOLARSHIP_EMAIL
+    value: hessscholarshipfund@gmail.com
   - key: NODE_ENV
     value: production
   - key: PORT

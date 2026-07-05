@@ -103,9 +103,23 @@ class EmailService {
         }
     }
 
+    escapeHtml(value) {
+        return String(value || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    renderField(label, value) {
+        return `<p><strong>${this.escapeHtml(label)}:</strong> ${this.escapeHtml(value || 'Not provided')}</p>`;
+    }
+
     // Helper method to send campaign notifications
     async sendCampaignNotification(type, data) {
         const campaignEmail = process.env.CAMPAIGN_EMAIL || 'info@hessforsheriff.com';
+        const scholarshipEmail = process.env.SCHOLARSHIP_EMAIL || 'hessscholarshipfund@gmail.com';
         
         if (type === 'volunteer') {
             const subject = '🎉 New Volunteer Sign-up - Hess for Sheriff';
@@ -164,6 +178,47 @@ class EmailService {
             `;
             
             return await this.sendEmail(campaignEmail, subject, html, data.email);
+        } else if (type === 'scholarship') {
+            const subject = `New Scholarship Submission - ${data.student_name}`;
+            const html = `
+                <div style="font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto;">
+                    <div style="background: #1A243B; color: white; padding: 20px; text-align: center;">
+                        <h1>New Scholarship Submission</h1>
+                        <p style="margin: 0;">Brian Hess Scholarship Fund of Putnam County, Inc.</p>
+                    </div>
+                    <div style="padding: 30px 20px;">
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                            ${this.renderField('Student Name', data.student_name)}
+                            ${this.renderField('Email', data.email)}
+                            ${this.renderField('Phone', data.phone)}
+                            ${this.renderField('High School', data.school)}
+                            ${this.renderField('Graduation Year', data.graduation_year)}
+                            ${this.renderField('Post-Secondary Plan', data.post_secondary_plan)}
+                            ${this.renderField('Reference or Recommender', data.reference)}
+                            ${this.renderField('Submitted', new Date().toLocaleString())}
+                        </div>
+                        <div style="background: white; padding: 15px; border-left: 4px solid #B22222; margin: 15px 0;">
+                            <p><strong>Community Service and Activities</strong></p>
+                            <p style="white-space: pre-wrap;">${this.escapeHtml(data.community_service)}</p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-left: 4px solid #B22222; margin: 15px 0;">
+                            <p><strong>Leadership Experience</strong></p>
+                            <p style="white-space: pre-wrap;">${this.escapeHtml(data.leadership)}</p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-left: 4px solid #B22222; margin: 15px 0;">
+                            <p><strong>Personal Statement</strong></p>
+                            <p style="white-space: pre-wrap;">${this.escapeHtml(data.essay)}</p>
+                        </div>
+                        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+                        <p style="color: #666; font-size: 12px;">
+                            Submission ID: ${this.escapeHtml(data.id)}<br>
+                            IP Address: ${this.escapeHtml(data.ip || 'Unknown')}
+                        </p>
+                    </div>
+                </div>
+            `;
+
+            return await this.sendEmail(scholarshipEmail, subject, html, data.email);
         }
     }
 
@@ -226,6 +281,31 @@ class EmailService {
                 </div>
             `;
             
+            return await this.sendEmail(data.email, subject, html);
+            
+        } else if (type === 'scholarship') {
+            const subject = 'Scholarship submission received';
+            const html = `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <div style="background: #1A243B; color: white; padding: 20px; text-align: center;">
+                        <h1>Submission Received</h1>
+                        <p style="margin: 0;">Brian Hess Scholarship Fund of Putnam County, Inc.</p>
+                    </div>
+                    <div style="padding: 30px 20px;">
+                        <p>Dear ${this.escapeHtml(data.student_name)},</p>
+                        <p>Thank you for submitting your scholarship information. Your submission has been received by the Brian Hess Scholarship Fund of Putnam County, Inc.</p>
+                        <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #B22222; margin: 20px 0;">
+                            <p><strong>High School:</strong> ${this.escapeHtml(data.school)}</p>
+                            <p><strong>Graduation Year:</strong> ${this.escapeHtml(data.graduation_year)}</p>
+                            <p><strong>Submission ID:</strong> ${this.escapeHtml(data.id)}</p>
+                        </div>
+                        <p>If additional information is needed, the scholarship committee will contact you using the email address provided.</p>
+                        <br>
+                        <p>Brian Hess Scholarship Fund of Putnam County, Inc.</p>
+                    </div>
+                </div>
+            `;
+
             return await this.sendEmail(data.email, subject, html);
         }
     }

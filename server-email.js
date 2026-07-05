@@ -48,6 +48,10 @@ function simpleRateLimit(req, res, next) {
     next();
 }
 
+function cleanText(value) {
+    return String(value || '').trim();
+}
+
 // Email sending function using Gmail SMTP
 async function sendEmail(to, subject, html, replyTo = null) {
     return await emailService.sendEmail(to, subject, html, replyTo);
@@ -161,6 +165,58 @@ app.post('/api/forms/contact', simpleRateLimit, async (req, res) => {
         success: true, 
         message: 'Thank you for your message! Check your email for confirmation.',
         id: submission.id 
+    });
+});
+
+// Scholarship application submission with email
+app.post('/api/forms/scholarship', simpleRateLimit, async (req, res) => {
+    const {
+        student_name,
+        email,
+        phone,
+        school,
+        graduation_year,
+        post_secondary_plan,
+        community_service,
+        leadership,
+        essay,
+        reference,
+        certification
+    } = req.body;
+
+    if (!student_name || !email || !school || !graduation_year || !community_service || !leadership || !essay || certification !== 'yes') {
+        return res.status(400).json({ error: 'Please complete all required scholarship fields.' });
+    }
+
+    const submission = {
+        id: submissions.length + 1,
+        type: 'scholarship',
+        student_name: cleanText(student_name),
+        email: cleanText(email),
+        phone: cleanText(phone),
+        school: cleanText(school),
+        graduation_year: cleanText(graduation_year),
+        post_secondary_plan: cleanText(post_secondary_plan),
+        community_service: cleanText(community_service),
+        leadership: cleanText(leadership),
+        essay: cleanText(essay),
+        reference: cleanText(reference),
+        certification: cleanText(certification),
+        submitted_at: new Date().toISOString(),
+        ip: req.ip || req.connection.remoteAddress
+    };
+
+    submissions.push(submission);
+    analytics.submissions++;
+    saveData();
+
+    await emailService.sendCampaignNotification('scholarship', submission);
+    await emailService.sendConfirmationEmail('scholarship', submission);
+
+    res.json({
+        success: true,
+        message: 'Thank you. Your scholarship submission was received.',
+        id: submission.id
     });
 });
 
